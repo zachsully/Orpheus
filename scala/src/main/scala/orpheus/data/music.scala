@@ -1,6 +1,6 @@
 //*****************************************************************************/
 //                                                                  2017.01.11
-// Module      :  data.music
+// Module      :  orpheus.data.music
 // Copyright   :  Copyright (c) 2017 Zach Sullivan
 // License     :  BSD3
 // Maintainer  :  zsulliva@cs.uoregon.edu
