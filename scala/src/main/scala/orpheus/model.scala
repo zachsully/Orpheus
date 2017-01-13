@@ -14,16 +14,22 @@
 package orpheus.model
 
 import com.cra.figaro.language._
+import com.cra.figaro.library.atomic.continuous.dirichlet
 import orpheus.data.music._
 
-// We want our model to represent a distibution over data.music
-class MMusic {
-  lazy val rat = 1 / 7
-  // val keyCenter = Select(rat -> A
-  // 			,rat -> B
-  // 		        ,rat -> C
-  // 			,rat -> D
-  // 		        ,rat -> E
-  // 			,rat -> F
-  // 		        ,rat -> G)
+// since all data is categorical, all of these will have a dirichlet prior over
+// their children
+class MeasPitchclass {
+}
+
+class MeasAccidental {
+}
+
+class MeasDuration {
+}
+
+class MeasPrimitive {
+}
+
+class MeasMusic {
 }
