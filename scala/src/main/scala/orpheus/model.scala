@@ -14,22 +14,21 @@
 package orpheus.model
 
 import com.cra.figaro.language._
-import com.cra.figaro.library.atomic.continuous.dirichlet
+// import com.cra.figaro.library.atomic.continuous.dirichlet
 import orpheus.data.music._
 
+// Naively --
 // since all data is categorical, all of these will have a dirichlet prior over
 // their children
-class MeasPitchclass {
-}
 
-class MeasAccidental {
-}
+// Learning this model from data will capture the most probable musical
+// structures
 
-class MeasDuration {
-}
 
-class MeasPrimitive {
-}
 
-class MeasMusic {
-}
+
+// On second thought, the most important aspect we want to capture if we are
+// learning from data is how the key center, rhythm, melody, tempo, and loudness
+// change over time.
+// Because of this, a FOCUS on a markov model will be preferable. That is, we
+// make the Seq constructor the first thing we consider
