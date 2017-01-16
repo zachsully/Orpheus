@@ -23,7 +23,8 @@ import orpheus.data.music._
 
 // Learning this model from data will capture the most probable musical
 // structures
-
+class MeasPitchclass extends Pitchclass {
+}
 
 
 
