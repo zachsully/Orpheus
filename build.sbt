@@ -17,5 +17,6 @@ lazy val root = (project in file("."))
 
 lazy val orpheus = Project("orpheus", file("scala"))
 .settings(
-  libraryDependencies += "com.cra.figaro" % "figaro_2.11" % "4.0.0.0"
+  libraryDependencies += "com.cra.figaro" % "figaro_2.11" % "4.0.0.0",
+  libraryDependencies += "de.sciss" %% "scalacollider" % "1.22.3"
 )
