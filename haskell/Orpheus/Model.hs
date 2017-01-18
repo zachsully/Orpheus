@@ -15,19 +15,24 @@
 module Orpheus.Model where
 
 import Orpheus.Data.Music
-import Language.Hakaru.Measure
 
-measMusic :: Measure Music
-measMusic = undefined
+measMusic :: (ABT Term abt)
+          => abt '[] 'HArray 'HProb
+          -> abt '[] ('HMeasure HMusic)
+measMusic probs =
+  -- categorical probs >>= \c ->
+  --   case_ c
+  --     [ Branch 0
+  --     ]
 
-measPrimitive :: Measure Primitive
+measPrimitive :: (ABT Term abt) => abt '[] ('HMeasure HPrimitive)
 measPrimitive = undefined
 
-measDuration :: Measure Duration
+measDuration :: (ABT Term abt) => abt '[] ('HMeasure HDuration)
 measDuration = undefined
 
-measAccidental :: Measure Accidental
+measAccidental :: (ABT Term abt) => abt '[] ('HMeasure HAccidental)
 measAccidental = undefined
 
-measPitchclass :: Measure Pitchclass
+measPitchclass :: (ABT Term abt) => abt '[] ('HMeasure HPitchclass)
 measPitchclass = undefined
