@@ -13,6 +13,8 @@
 
 package orpheus.data.music
 
+// pure data
+// this is how it would be implemented in a functional language without objects
 sealed abstract class Pitchclass
 case object A extends Pitchclass
 case object B extends Pitchclass
@@ -47,3 +49,10 @@ sealed abstract class Music
 case class Prim ( prim : Primitive    ) extends Music
 case class Seq  ( seq : (Music,Music) ) extends Music
 case class Par  ( par : (Music,Music) ) extends Music
+
+//*****************************************************************************/
+//                                  Objects
+//*****************************************************************************/
+class MPitchclass {
+  val pitchclass = 
+}

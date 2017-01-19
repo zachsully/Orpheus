@@ -20,10 +20,12 @@ measMusic :: (ABT Term abt)
           => abt '[] 'HArray 'HProb
           -> abt '[] ('HMeasure HMusic)
 measMusic probs =
-  -- categorical probs >>= \c ->
-  --   case_ c
-  --     [ Branch 0
-  --     ]
+  categorical probs >>= \c ->
+    case_ c
+      [ Branch 0 ()
+      , Branch 1 ()
+      , Branch 2 ()
+      ]
 
 measPrimitive :: (ABT Term abt) => abt '[] ('HMeasure HPrimitive)
 measPrimitive = undefined

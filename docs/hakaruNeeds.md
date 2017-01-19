@@ -13,3 +13,5 @@ three areas of the model where we would want recursion for:
 3. We would also want recursion for parallel composition of pieces. For
    instance, we might want to be able to draw a 2 part harmony and 4 part
    harmony from the same sample.
+
+Can return variable array length
