@@ -1,3 +1,5 @@
+{-# LANGUAGE DataKinds,
+             FlexibleContexts #-}
 --------------------------------------------------------------------------------
 --                                                                  2017.01.13
 -- |
@@ -16,16 +18,21 @@ module Orpheus.Model where
 
 import Orpheus.Data.Music
 
+import Language.Hakaru.Syntax.Prelude
+import Language.Hakaru.Types.DataKind
+import Language.Hakaru.Syntax.AST
+import Language.Hakaru.Syntax.ABT
+
 measMusic :: (ABT Term abt)
-          => abt '[] 'HArray 'HProb
+          => abt '[] ('HArray 'HProb)
           -> abt '[] ('HMeasure HMusic)
-measMusic probs =
-  categorical probs >>= \c ->
-    case_ c
-      [ Branch 0 ()
-      , Branch 1 ()
-      , Branch 2 ()
-      ]
+measMusic probs = undefined
+  -- categorical probs >>= \c ->
+  --   case_ c
+  --     [ Branch 0 ()
+  --     , Branch 1 ()
+  --     , Branch 2 ()
+  --     ]
 
 measPrimitive :: (ABT Term abt) => abt '[] ('HMeasure HPrimitive)
 measPrimitive = undefined
