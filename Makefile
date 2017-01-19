@@ -1,5 +1,5 @@
 build:
-	sbt compile
+	sbt update; sbt compile; cabal build
 
 clean:
-	rm -rf dist target *~
+	sbt clean; cabal clean; rm -rf dist target *~
