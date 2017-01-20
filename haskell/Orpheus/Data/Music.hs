@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds,
              OverloadedStrings,
-             TypeFamilies       #-}
+             TypeFamilies,
+             StandaloneDeriving #-}
 --------------------------------------------------------------------------------
 --                                                                  2017.01.11
 -- |
@@ -21,9 +22,16 @@ import Language.Hakaru.Types.DataKind
 import Language.Hakaru.Syntax.Datum
 import Language.Hakaru.Types.Sing
 
+-- import Data.Typeable (Typeable)
+-- import GHC.TypeLits (Symbol)
+
+
 {-
   Two representations, one in Haskell and one in Hakaru. The one in Haskell is
   a simple example of what the Hakaru one should look like.
+
+  Much of this file is boilerplate. We could simplify the process by using
+  template Haskell.
 -}
 --------------------------------------------------------------------------------
 data Pitchclass = A | B | C | D | E | F | G
