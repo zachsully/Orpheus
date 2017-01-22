@@ -3,7 +3,7 @@
 --------------------------------------------------------------------------------
 --                                                                  2017.01.13
 -- |
--- Module      :  Orpheus.Model
+-- Module      :  Orpheus.Model.CatChromatic
 -- Copyright   :  Copyright (c) 2017 Zach Sullivan
 -- License     :  BSD3
 -- Maintainer  :  zsulliva@cs.uoregon.edu
@@ -14,9 +14,9 @@
 --
 --------------------------------------------------------------------------------
 
-module Orpheus.Model where
+module Orpheus.Model.CategoricalDiatonic where
 
-import Orpheus.Data.Music
+import Orpheus.Data.Music.Diatonic
 
 import Language.Hakaru.Syntax.Prelude
 import Language.Hakaru.Types.DataKind

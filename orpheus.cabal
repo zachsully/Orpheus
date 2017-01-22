@@ -1,7 +1,7 @@
 name:                orpheus
 version:             0.0.1.0
 synopsis:            Music analysis
-description:         A library for probabilistic music analysis
+description:         A ]library for probabilistic music analysis
 homepage:            zachsully.com
 license:             BSD3
 license-file:        LICENSE
@@ -13,8 +13,8 @@ extra-source-files:  ChangeLog.md
 cabal-version:       >=1.10
 
 library
-  exposed-modules:     Orpheus.Model,
-                       Orpheus.Data.Music
+  exposed-modules:     Orpheus.Model.CategoricalDiatonic,
+                       Orpheus.Data.Music.Diatonic
   -- other-modules:
   other-extensions:    DataKinds, OverloadedStrings, TypeFamilies
   build-depends:       base >=4.9 && <4.10,

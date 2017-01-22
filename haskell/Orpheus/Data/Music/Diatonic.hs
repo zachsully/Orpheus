@@ -5,7 +5,7 @@
 --------------------------------------------------------------------------------
 --                                                                  2017.01.11
 -- |
--- Module      :  Orpheus.Data.Music
+-- Module      :  Orpheus.Data.Music.Chromatic
 -- Copyright   :  Copyright (c) 2017 Zach Sullivan
 -- License     :  BSD3
 -- Maintainer  :  zsulliva@cs.uoregon.edu
@@ -16,7 +16,7 @@
 --
 --------------------------------------------------------------------------------
 
-module Orpheus.Data.Music where
+module Orpheus.Data.Music.Diatonic where
 
 import Language.Hakaru.Types.DataKind
 import Language.Hakaru.Syntax.Datum
@@ -25,6 +25,9 @@ import Language.Hakaru.Types.Sing
 -- import Data.Typeable (Typeable)
 -- import GHC.TypeLits (Symbol)
 
+class Hakaruable a where
+  toHakaru   :: a -> abt '[] b
+  fromHakaru :: abt '[] b -> a
 
 {-
   Two representations, one in Haskell and one in Hakaru. The one in Haskell is
@@ -66,7 +69,6 @@ sPitchclass =
 
 sSymbol_Pitchclass :: Sing "Pitchclass"
 sSymbol_Pitchclass = SingSymbol
-
 
 
 --------------------------------------------------------------------------------
@@ -194,3 +196,23 @@ sMusic =
 
 sSymbol_Music :: Sing "Music"
 sSymbol_Music = SingSymbol
+
+--------------------------------------------------------------------------------
+
+maryHadALittleLamb :: Music
+maryHadALittleLamb =
+  let e4 = Prim (Note E [] 4 (Half . Half $ Whole))
+      e2 = Prim (Note E [] 4 (Half Whole))
+
+      d4 = Prim (Note D [] 4 (Half . Half $ Whole))
+      d2 = Prim (Note D [] 4 (Half Whole))
+
+      c4 = Prim (Note C [] 4 (Half . Half $ Whole))
+      c1 = Prim (Note C [] 4 Whole)
+  in foldr Seq c1 [e4,d4,c4,d4
+                  ,e4,e4,e2
+                  ,d4,d4,d2
+                  ,e4,e4,e2
+                  ,e4,d4,c4,d4
+                  ,e4,e4,e4,c4
+                  ,d4,d4,e4,d4]
