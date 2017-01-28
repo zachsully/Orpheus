@@ -4,14 +4,14 @@ let
 
   inherit (nixpkgs) pkgs;
 
-  f = { mkDerivation, base, stdenv }:
+  f = { mkDerivation, base, hakaru, parsec, pretty, stdenv }:
       mkDerivation {
         pname = "orpheus";
         version = "0.0.1.0";
         src = ./.;
-        libraryHaskellDepends = [ base ];
-        doHaddock = false;
+        libraryHaskellDepends = [ base hakaru parsec pretty ];
         homepage = "zachsully.com";
+        description = "Music analysis";
         license = stdenv.lib.licenses.bsd3;
       };
 

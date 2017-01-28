@@ -5,7 +5,7 @@
 --------------------------------------------------------------------------------
 --                                                                  2017.01.11
 -- |
--- Module      :  Orpheus.Data.Music.Chromatic
+-- Module      :  Orpheus.Data.Music.Diatonic
 -- Copyright   :  Copyright (c) 2017 Zach Sullivan
 -- License     :  BSD3
 -- Maintainer  :  zsulliva@cs.uoregon.edu
@@ -105,28 +105,25 @@ sSymbol_Accidental = SingSymbol
 data Duration
   = Whole
   | Half Duration
-  | Dot  Duration
   deriving (Show,Eq,Ord)
 
 type HDuration
-  = 'HData ('TyCon "Duration") '[ '[] , '[ 'I ] , '[ 'I ] ]
-                              {- Whole |   H D  |    D D -}
+  = 'HData ('TyCon "Duration") '[ '[] , '[ 'I ]  ]
+                              {- Whole |   H D  -}
 
 
-type instance Code ('TyCon "Duration") = '[ '[] , '[ 'I ] , '[ 'I ] ]
+type instance Code ('TyCon "Duration") = '[ '[] , '[ 'I ] ]
 
 hWhole :: Datum ast HDuration
 hWhole = Datum "Whole" sDuration (Inl Done)
 
-hHalf, hDot :: ast HDuration -> Datum ast HDuration
+hHalf :: ast HDuration -> Datum ast HDuration
 hHalf d = Datum "Half" sDuration (Inr . Inl $ Ident d `Et` Done)
-hDot  d = Datum "Half" sDuration (Inr . Inr . Inl $ Ident d `Et` Done)
 
 sDuration :: Sing HDuration
 sDuration =
   SData (STyCon sSymbol_Duration)
     (SDone `SPlus`
-     (SIdent `SEt` SDone) `SPlus`
      (SIdent `SEt` SDone) `SPlus`
      SVoid)
 
@@ -137,8 +134,13 @@ sSymbol_Duration = SingSymbol
 
 --------------------------------------------------------------------------------
 data Primitive
-  = Note Pitchclass [Accidental] Int Duration -- the Int is the octive
+  = Note Pitchclass
+         [Accidental]
+         Int           -- octive
+         Duration
+         Bool          -- dotted?
   | Rest Duration
+         Bool          -- dotted?
   deriving (Show,Eq,Ord)
 
 type HPrimitive
@@ -146,15 +148,19 @@ type HPrimitive
            '[ '[ 'K HPitchclass
                , 'K (HList HAccidental)
                , 'K 'HInt
-               , 'K HDuration ]
-            , '[ 'K HDuration ] ]
+               , 'K HDuration
+               , 'K HBool ]
+            , '[ 'K HDuration
+               , 'K HBool ] ]
 
 type instance Code ('TyCon "Primitive") =
   '[ '[ 'K HPitchclass
       , 'K (HList HAccidental)
       , 'K 'HInt
-      , 'K HDuration ]
-   , '[ 'K HDuration ] ]
+      , 'K HDuration
+      , 'K HBool ]
+   , '[ 'K HDuration
+      , 'K HBool ] ]
 
 sPrimitive :: Sing HPrimitive
 sPrimitive =
@@ -163,8 +169,9 @@ sPrimitive =
       `SEt` (SKonst . sList $ sAccidental)
       `SEt` (SKonst SInt)
       `SEt` (SKonst sDuration)
+      `SEt` (SKonst sBool)
       `SEt` SDone)
-    `SPlus` (SKonst sDuration `SEt` SDone)
+    `SPlus` (SKonst sDuration `SEt` (SKonst sBool) `SEt` SDone)
     `SPlus` SVoid)
 
 sSymbol_Primitive :: Sing "Primitive"
@@ -201,14 +208,14 @@ sSymbol_Music = SingSymbol
 
 maryHadALittleLamb :: Music
 maryHadALittleLamb =
-  let e4 = Prim (Note E [] 4 (Half . Half $ Whole))
-      e2 = Prim (Note E [] 4 (Half Whole))
+  let e4 = Prim (Note E [] 4 (Half . Half $ Whole) False)
+      e2 = Prim (Note E [] 4 (Half Whole) False)
 
-      d4 = Prim (Note D [] 4 (Half . Half $ Whole))
-      d2 = Prim (Note D [] 4 (Half Whole))
+      d4 = Prim (Note D [] 4 (Half . Half $ Whole) False)
+      d2 = Prim (Note D [] 4 (Half Whole) False)
 
-      c4 = Prim (Note C [] 4 (Half . Half $ Whole))
-      c1 = Prim (Note C [] 4 Whole)
+      c4 = Prim (Note C [] 4 (Half . Half $ Whole) False)
+      c1 = Prim (Note C [] 4 Whole False)
   in foldr Seq c1 [e4,d4,c4,d4
                   ,e4,e4,e2
                   ,d4,d4,d2

@@ -14,10 +14,28 @@ cabal-version:       >=1.10
 
 library
   exposed-modules:     Orpheus.Model.CategoricalDiatonic,
-                       Orpheus.Data.Music.Diatonic
-  -- other-modules:
+                       Orpheus.Data.Music.Diatonic,
+                       Orpheus.Data.Parser,
+                       Orpheus.Data.Pretty
+
   other-extensions:    DataKinds, OverloadedStrings, TypeFamilies
+
   build-depends:       base >=4.9 && <4.10,
-                       hakaru >=0.3 && <0.4
+                       hakaru >=0.3 && <0.4,
+                       parsec >= 3.1,
+                       pretty >= 1.1
+
   hs-source-dirs:      haskell
   default-language:    Haskell2010
+  GHC-Options:         -O2 -Wall -fwarn-tabs
+
+executable orpheus
+  Main-is:             Main.hs
+
+  build-depends:       base >= 4.7  && < 5.0,
+                       pretty >= 1.1,
+                       orpheus >= 0.0
+
+  hs-source-dirs:      haskell/Orpheus
+  default-language:    Haskell2010
+  GHC-Options:         -O2 -Wall -fwarn-tabs
