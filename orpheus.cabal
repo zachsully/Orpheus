@@ -15,6 +15,9 @@ cabal-version:       >=1.10
 library
   exposed-modules:     Orpheus.Model.CategoricalDiatonic,
                        Orpheus.Data.Music.Diatonic,
+                       Orpheus.Data.Music.Progression,
+                       Orpheus.Data.Music.Form,
+                       Orpheus.Data.Music.Chord,
                        Orpheus.Data.Parser,
                        Orpheus.Data.Pretty
 

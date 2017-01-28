@@ -1,17 +1,18 @@
 --------------------------------------------------------------------------------
---                                                                  2017.01.27
+--                                                                  2017.01.28
 -- |
--- Module      :  Orpheus.Data.Music.Lilypond
+-- Module      :  Orpheus.Data.Music.Progression
 -- Copyright   :  Copyright (c) 2017 Zach Sullivan
 -- License     :  BSD3
 -- Maintainer  :  zsulliva@cs.uoregon.edu
 -- Stability   :  experimental
 -- Portability :  GHC-only
 --
--- A score markup format
+-- Data description for Western music progressions
 --
 --------------------------------------------------------------------------------
 
-module Orpheus.Data.Music.Lilypond where
+module Orpheus.Data.Music.Progression where
 
-data Score
+data Intervals = I | II | III | IV | V | VI | VII
+  deriving (Show,Eq,Ord)

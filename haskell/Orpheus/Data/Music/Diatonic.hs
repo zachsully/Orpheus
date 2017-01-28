@@ -22,13 +22,6 @@ import Language.Hakaru.Types.DataKind
 import Language.Hakaru.Syntax.Datum
 import Language.Hakaru.Types.Sing
 
--- import Data.Typeable (Typeable)
--- import GHC.TypeLits (Symbol)
-
-class Hakaruable a where
-  toHakaru   :: a -> abt '[] b
-  fromHakaru :: abt '[] b -> a
-
 {-
   Two representations, one in Haskell and one in Hakaru. The one in Haskell is
   a simple example of what the Hakaru one should look like.
@@ -46,7 +39,7 @@ type HPitchclass =
 
 type instance Code ('TyCon "Pitchclass") = '[ '[], '[], '[], '[], '[], '[], '[] ]
 
-hA,hB,hC,hD,hE,hG :: Datum ast HPitchclass
+hA,hB,hC,hD,hE,hF,hG :: Datum ast HPitchclass
 hA = Datum "A" sPitchclass (Inl Done)
 hB = Datum "B" sPitchclass (Inr . Inl $ Done)
 hC = Datum "C" sPitchclass (Inr . Inr . Inl $ Done)
