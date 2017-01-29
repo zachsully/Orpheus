@@ -3,7 +3,7 @@
 --------------------------------------------------------------------------------
 --                                                                  2017.01.13
 -- |
--- Module      :  Orpheus.Model.CatChromatic
+-- Module      :  Orpheus.Model.Diatonic
 -- Copyright   :  Copyright (c) 2017 Zach Sullivan
 -- License     :  BSD3
 -- Maintainer  :  zsulliva@cs.uoregon.edu
@@ -14,7 +14,7 @@
 --
 --------------------------------------------------------------------------------
 
-module Orpheus.Model.CategoricalDiatonic where
+module Orpheus.Model.Diatonic where
 
 import Orpheus.Data.Music.Diatonic
 
@@ -23,7 +23,7 @@ import Language.Hakaru.Types.DataKind
 import Language.Hakaru.Syntax.AST
 import Language.Hakaru.Syntax.ABT
 
-import Prelude hiding ((>>=),(==))
+import Prelude hiding ((>>=),(==),(/))
 
 measMusic
   :: (ABT Term abt)
@@ -33,17 +33,7 @@ measMusic
   -> abt '[] ('HArray 'HProb)
   -> abt '[] ('HArray 'HProb)
   -> abt '[] ('HMeasure HMusic)
-measMusic m_prior p_prior d_prior a_prior pc_prior =
-  dirichlet m_prior >>= \m_ps ->
-    categorical m_ps >>= \m_c ->
-      undefined
-      -- if_ (nat_ 0 == m_c)
-      --     (dirac (datum_ hSharp))
-          -- (if_ (nat_ 1 == m_c)
-          --      (dirac (datum_ hFlat))
-          --      (dirac (datum_ hNatural)))
-
-
+measMusic _ _ _ _ _ = undefined
 
 measPrimitive :: (ABT Term abt) => abt '[] ('HMeasure HPrimitive)
 measPrimitive = undefined
@@ -101,3 +91,8 @@ catPitchclass prior =
                             (if_ (nat_ 5 == c)
                                  (dirac (datum_ hF))
                                  (dirac (datum_ hG)))))))
+
+mPitchclass
+  :: (ABT Term abt)
+  => abt '[] ('HMeasure HPitchclass)
+mPitchclass = catPitchclass (array (nat_ 7) (\_ -> prob_ 1 / prob_ 7))

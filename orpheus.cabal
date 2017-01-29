@@ -13,7 +13,7 @@ extra-source-files:  ChangeLog.md
 cabal-version:       >=1.10
 
 library
-  exposed-modules:     Orpheus.Model.CategoricalDiatonic,
+  exposed-modules:     Orpheus.Model.Diatonic,
                        Orpheus.Data.Music.Diatonic,
                        Orpheus.Data.Music.Progression,
                        Orpheus.Data.Music.Form,
@@ -23,10 +23,11 @@ library
 
   other-extensions:    DataKinds, OverloadedStrings, TypeFamilies
 
-  build-depends:       base >=4.9 && <4.10,
-                       hakaru >=0.3 && <0.4,
-                       parsec >= 3.1,
-                       pretty >= 1.1
+  build-depends:       base       >= 4.9 && < 4.10,
+                       hakaru     >= 0.3 && < 0.4,
+                       parsec     >= 3.1,
+                       pretty     >= 1.1,
+                       mwc-random >= 0.13 && < 0.14
 
   hs-source-dirs:      haskell
   default-language:    Haskell2010
@@ -35,9 +36,12 @@ library
 executable orpheus
   Main-is:             Main.hs
 
-  build-depends:       base >= 4.7  && < 5.0,
-                       pretty >= 1.1,
-                       orpheus >= 0.0
+  build-depends:       base       >= 4.7  && < 5.0,
+                       pretty     >= 1.1,
+                       mwc-random >= 0.13 && < 0.14,
+                       hakaru     >= 0.3 && < 0.4,
+                       orpheus    >= 0.0
+
 
   hs-source-dirs:      haskell/Orpheus
   default-language:    Haskell2010
