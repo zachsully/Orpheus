@@ -21,16 +21,25 @@ import Language.Hakaru.Syntax.Prelude
 import Language.Hakaru.Pretty.Concrete
 import Orpheus.Data.Music.Diatonic
 import Orpheus.Model.Diatonic
-import Orpheus.Data.Pretty
 import qualified Text.PrettyPrint   as PP
 import qualified System.Random.MWC  as MWC
 import Control.Monad
 
 main :: IO ()
 main = do
-  let m = runEvaluate $ triv $ mPitchclass
+  let m  = runEvaluate $ triv $ mDuration
+      m2 = runEvaluate $ triv $ categorical (array (nat_ 2) (\_ -> prob_ 0.5))
+      m3 = runEvaluate $ triv $ geometric (prob_ 0.5)
   gen <- MWC.createSystemRandom
-  forever $ illustrate (SMeasure sPitchclass) gen m
+  forever $ illustrate (SMeasure SNat) gen m3
+{-
+  mDuration is defined recursively and never returns a sample. Should this just
+  be modelled with a geometric distribution instead?
+
+  BUG: geometric will run into an infinite loop when drawing samples
+
+  What does this mean for mMusic which is recursive in several ways?
+-}
 
 illustrate :: Sing a -> MWC.GenIO -> Value a -> IO ()
 illustrate (SMeasure s) g (VMeasure m) = do
@@ -38,7 +47,6 @@ illustrate (SMeasure s) g (VMeasure m) = do
     case x of
       Just (samp, _) -> illustrate s g samp
       Nothing        -> illustrate (SMeasure s) g (VMeasure m)
-
 illustrate _ _ x = render x
 
 render :: Value a -> IO ()

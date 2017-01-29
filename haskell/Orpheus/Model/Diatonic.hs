@@ -38,9 +38,14 @@ measMusic _ _ _ _ _ = undefined
 measPrimitive :: (ABT Term abt) => abt '[] ('HMeasure HPrimitive)
 measPrimitive = undefined
 
-measDuration :: (ABT Term abt) => abt '[] ('HMeasure HDuration)
-measDuration = undefined
-
+mDuration
+  :: (ABT Term abt)
+  => abt '[] ('HMeasure HDuration)
+mDuration =
+  categorical (array (nat_ 2) (\_ -> prob_ 0.5)) >>= \c ->
+    if_ (nat_ 0 == c)
+        (dirac (datum_ hWhole))
+        (mDuration >>= \d -> dirac $ datum_ (hHalf d))
 
 dirAccidental
   :: (ABT Term abt)
