@@ -18,8 +18,8 @@
 
 module Orpheus.Data.Music.Diatonic where
 
-import Language.Hakaru.Types.DataKind
 import Language.Hakaru.Syntax.Datum
+import Language.Hakaru.Types.DataKind
 import Language.Hakaru.Types.Sing
 
 {-
@@ -95,34 +95,45 @@ sSymbol_Accidental = SingSymbol
 
 
 --------------------------------------------------------------------------------
-data Duration
-  = Whole
-  | Half Duration
-  deriving (Show,Eq,Ord)
+{-
+  Duration is an integer where 0 is a whole note, 2 is an eighth note. These
+  represent note durations as:
+
+                             dur(i) = 2 ^ i
+
+                             quad   whole = 4
+                             double whole = 2
+                                    whole = 1
+                                    half  = 1/2
+                                  quarter = 1/4
+
+                                                 *
+                                            *    *    *
+                                  *    *    *    *    *    *
+                             <----|----|----|----|----|----|----->
+                                  2    1   1/2  1/4  1/8  1/16
+
+  A guess is that these notes are discretely normally distributed on the
+  rationals
+-}
+type Duration = Integer
 
 type HDuration
-  = 'HData ('TyCon "Duration") '[ '[] , '[ 'I ]  ]
-                              {- Whole |   H D  -}
+  = 'HData ('TyCon "Duration") '[ '[ 'K 'HInt ] ]
 
-
-type instance Code ('TyCon "Duration") = '[ '[] , '[ 'I ] ]
-
-hWhole :: Datum ast HDuration
-hWhole = Datum "Whole" sDuration (Inl Done)
-
-hHalf :: ast HDuration -> Datum ast HDuration
-hHalf d = Datum "Half" sDuration (Inr . Inl $ Ident d `Et` Done)
+type instance Code ('TyCon "Duration") = '[ '[ 'K 'HInt ] ]
 
 sDuration :: Sing HDuration
 sDuration =
   SData (STyCon sSymbol_Duration)
-    (SDone `SPlus`
-     (SIdent `SEt` SDone) `SPlus`
-     SVoid)
+    ((SKonst SInt `SEt` SDone) `SPlus` SVoid)
 
 sSymbol_Duration :: Sing "Duration"
 sSymbol_Duration = SingSymbol
 
+-- Constructor
+hDuration :: ast 'HInt -> Datum ast HDuration
+hDuration d = Datum "Duration" sDuration (Inl $ Konst d `Et` Done)
 
 
 --------------------------------------------------------------------------------
@@ -201,14 +212,14 @@ sSymbol_Music = SingSymbol
 
 maryHadALittleLamb :: Music
 maryHadALittleLamb =
-  let e4 = Prim (Note E [] 4 (Half . Half $ Whole) False)
-      e2 = Prim (Note E [] 4 (Half Whole) False)
+  let e4 = Prim (Note E [] 4 4 False)
+      e2 = Prim (Note E [] 4 2 False)
 
-      d4 = Prim (Note D [] 4 (Half . Half $ Whole) False)
-      d2 = Prim (Note D [] 4 (Half Whole) False)
+      d4 = Prim (Note D [] 4 4 False)
+      d2 = Prim (Note D [] 4 2 False)
 
-      c4 = Prim (Note C [] 4 (Half . Half $ Whole) False)
-      c1 = Prim (Note C [] 4 Whole False)
+      c4 = Prim (Note C [] 4 4 False)
+      c1 = Prim (Note C [] 4 1 False)
   in foldr Seq c1 [e4,d4,c4,d4
                   ,e4,e4,e2
                   ,d4,d4,d2

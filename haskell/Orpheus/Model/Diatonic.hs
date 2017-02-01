@@ -23,7 +23,7 @@ import Language.Hakaru.Types.DataKind
 import Language.Hakaru.Syntax.AST
 import Language.Hakaru.Syntax.ABT
 
-import Prelude hiding ((>>=),(==),(/))
+import Prelude hiding ((>>=),(==),(/),fromRational)
 
 measMusic
   :: (ABT Term abt)
@@ -42,10 +42,9 @@ mDuration
   :: (ABT Term abt)
   => abt '[] ('HMeasure HDuration)
 mDuration =
-  categorical (array (nat_ 2) (\_ -> prob_ 0.5)) >>= \c ->
-    if_ (nat_ 0 == c)
-        (dirac (datum_ hWhole))
-        (mDuration >>= \d -> dirac $ datum_ (hHalf d))
+  normal (real_ 1) (prob_ 1) >>= \n ->
+    dirac (datum_ $ hDuration $ fromRational n)
+
 
 dirAccidental
   :: (ABT Term abt)

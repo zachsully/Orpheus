@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeSynonymInstances #-}
 --------------------------------------------------------------------------------
 --                                                                  2017.01.28
 -- |
@@ -81,8 +82,10 @@ instance Pretty Duration where
   pretty = text . show . durNumber
 
 durNumber :: Duration -> Int
-durNumber Whole    = 1
-durNumber (Half x) = 2 * (durNumber x)
+durNumber x =
+  if x < 1
+  then error "TODO: prett durations longer than whole"
+  else 2 ^ x
 
 instance Pretty Primitive where
   pretty (Note pc acs oct dur dot) =
