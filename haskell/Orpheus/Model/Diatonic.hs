@@ -32,7 +32,7 @@ measMusic
   -> abt '[] ('HArray 'HProb)
   -> abt '[] ('HArray 'HProb)
   -> abt '[] ('HArray 'HProb)
-  -> abt '[] ('HMeasure HMusic)
+  -> abt '[] ('HMeasure HVoice)
 measMusic _ _ _ _ _ = undefined
 
 measPrimitive :: (ABT Term abt) => abt '[] ('HMeasure HPrimitive)
@@ -43,33 +43,31 @@ catDuration
   :: (ABT Term abt)
   => abt '[] ('HArray 'HProb)
   -> abt '[] ('HMeasure HAccidental)
-catDuration =
-  categorical prior >>= \c ->
-    if_ (nat_ 0 == c)
-        (dirac (datum_ hDWhole))
-        (if_ (nat_ 1 == c)
-             (dirac (datum_ hWhole))
-             (if_ (nat_ 2 == c)
-                  (dirac (datum_ hHalf))
-                  (if_ (nat_ 3 == c)
-                       (dirac (datum_ hQuarter))
-                       (if_ (nat_ 4 == c)
-                            (dirac (datum_ hEighth))
-                            (if_ (nat_ 5 == c)
-                                 (dirac (datum_ hSixteenth))
-                                 (dirac (datum_ hG)))))))
-hDWhole
-hWhole
-hHalf
-hQuarter
-hEighth
-hSixteenth
-hThirtySecond
-hSixtyFourth
-hOneTwentyEighth
-hTwoFiftySixth
-
-
+catDuration = undefined
+  -- categorical prior >>= \c ->
+  --   if_ (nat_ 0 == c)
+  --       (dirac (datum_ hDWhole))
+  --       (if_ (nat_ 1 == c)
+  --            (dirac (datum_ hWhole))
+  --            (if_ (nat_ 2 == c)
+  --                 (dirac (datum_ hHalf))
+  --                 (if_ (nat_ 3 == c)
+  --                      (dirac (datum_ hQuarter))
+  --                      (if_ (nat_ 4 == c)
+  --                           (dirac (datum_ hEighth))
+  --                           (if_ (nat_ 5 == c)
+  --                                (dirac (datum_ hSixteenth))
+  --                                (dirac (datum_ hG)))))))
+-- hDWhole
+-- hWhole
+-- hHalf
+-- hQuarter
+-- hEighth
+-- hSixteenth
+-- hThirtySecond
+-- hSixtyFourth
+-- hOneTwentyEighth
+-- hTwoFiftySixth
 
 mUniformDuration
   :: (ABT Term abt)

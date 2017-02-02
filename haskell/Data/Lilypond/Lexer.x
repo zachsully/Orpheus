@@ -1,6 +1,5 @@
 {
--- module Lilypond.Lexer where
-import System.Environment (getArgs)
+module Data.Lilypond.Lexer where
 }
 
 %wrapper "basic"
@@ -9,6 +8,8 @@ tokens :-
   $white+            ;
   [a-zA-z]           { TokenLetter . read }
   [0-9]+             { TokenDigit . read }
+  \<\<               { const TokenDoubleLeftAngleBracket }
+  \>\>               { const TokenDoubleRightAngleBracket }
   \<                 { const TokenLeftAngleBracket }
   \>                 { const TokenRightAngleBracket }
   \{                 { const TokenLeftBrace }
@@ -21,7 +22,9 @@ tokens :-
 
 {
 data Token
-  = TokenLeftAngleBracket
+  = TokenDoubleLeftAngleBracket
+  | TokenDoubleRightAngleBracket
+  | TokenLeftAngleBracket
   | TokenRightAngleBracket
   | TokenLeftBrace
   | TokenRightBrace
@@ -33,14 +36,4 @@ data Token
   | TokenPercent
   | TokenBackSlash
   deriving (Show)
-
-main :: IO ()
-main = do
-  (f:[]) <- getArgs
-  -- putStrLn f
-  x <- case f == "-" of
-         True  -> getContents
-         False -> readFile f
-  let toks = alexScanTokens x
-  mapM_ (putStrLn . show) toks
 }

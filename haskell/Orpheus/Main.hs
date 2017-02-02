@@ -27,7 +27,7 @@ import Control.Monad
 
 main :: IO ()
 main = do
-  let m  = runEvaluate $ triv $ mDuration
+  let -- m  = runEvaluate $ triv $ mDuration
       m2 = runEvaluate $ triv $ categorical (array (nat_ 2) (\_ -> prob_ 0.5))
       m3 = runEvaluate $ triv $ geometric (prob_ 0.5)
   gen <- MWC.createSystemRandom
