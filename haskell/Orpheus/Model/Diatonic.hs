@@ -38,14 +38,45 @@ measMusic _ _ _ _ _ = undefined
 measPrimitive :: (ABT Term abt) => abt '[] ('HMeasure HPrimitive)
 measPrimitive = undefined
 
-mDuration
+--------------------------------------------------------------------------------
+catDuration
+  :: (ABT Term abt)
+  => abt '[] ('HArray 'HProb)
+  -> abt '[] ('HMeasure HAccidental)
+catDuration =
+  categorical prior >>= \c ->
+    if_ (nat_ 0 == c)
+        (dirac (datum_ hDWhole))
+        (if_ (nat_ 1 == c)
+             (dirac (datum_ hWhole))
+             (if_ (nat_ 2 == c)
+                  (dirac (datum_ hHalf))
+                  (if_ (nat_ 3 == c)
+                       (dirac (datum_ hQuarter))
+                       (if_ (nat_ 4 == c)
+                            (dirac (datum_ hEighth))
+                            (if_ (nat_ 5 == c)
+                                 (dirac (datum_ hSixteenth))
+                                 (dirac (datum_ hG)))))))
+hDWhole
+hWhole
+hHalf
+hQuarter
+hEighth
+hSixteenth
+hThirtySecond
+hSixtyFourth
+hOneTwentyEighth
+hTwoFiftySixth
+
+
+
+mUniformDuration
   :: (ABT Term abt)
   => abt '[] ('HMeasure HDuration)
-mDuration =
-  normal (real_ 1) (prob_ 1) >>= \n ->
-    dirac (datum_ $ hDuration $ fromRational n)
+mUniformDuration = undefined
 
-
+--------------------------------------------------------------------------------
 dirAccidental
   :: (ABT Term abt)
   => abt '[] ('HArray 'HProb)
@@ -67,7 +98,7 @@ catAccidental prior =
              (dirac (datum_ hNatural)))
 
 
-
+--------------------------------------------------------------------------------
 dirPitchclass
   :: (ABT Term abt)
   => abt '[] ('HArray 'HProb)
@@ -96,7 +127,7 @@ catPitchclass prior =
                                  (dirac (datum_ hF))
                                  (dirac (datum_ hG)))))))
 
-mPitchclass
+mUniformPitchclass
   :: (ABT Term abt)
   => abt '[] ('HMeasure HPitchclass)
-mPitchclass = catPitchclass (array (nat_ 7) (\_ -> prob_ 1 / prob_ 7))
+mUniformPitchclass = catPitchclass (array (nat_ 7) (\_ -> prob_ 1 / prob_ 7))

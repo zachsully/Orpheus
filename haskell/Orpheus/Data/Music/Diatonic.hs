@@ -115,26 +115,78 @@ sSymbol_Accidental = SingSymbol
 
   A guess is that these notes are discretely normally distributed on the
   rationals
+
+  BUT, for now I will just hard code a number of categories and hope that my
+  data does not go outside
 -}
-type Duration = Integer
+data Duration
+  = DWhole
+  | Whole
+  | Half
+  | Quarter
+  | Eighth
+  | Sixteenth
+  | ThirtySecond
+  | SixtyFourth
+  | OneTwentyEighth
+  | TwoFiftySixth
+  deriving (Show,Eq,Ord)
 
 type HDuration
-  = 'HData ('TyCon "Duration") '[ '[ 'K 'HInt ] ]
+  = 'HData ('TyCon "Duration") '[ '[]
+                                , '[]
+                                , '[]
+                                , '[]
+                                , '[]
+                                , '[]
+                                , '[]
+                                , '[]
+                                , '[]
+                                , '[] ]
 
-type instance Code ('TyCon "Duration") = '[ '[ 'K 'HInt ] ]
+type instance Code ('TyCon "Duration")
+  =  '[ '[]
+      , '[]
+      , '[]
+      , '[]
+      , '[]
+      , '[]
+      , '[]
+      , '[]
+      , '[]
+      , '[] ]
 
 sDuration :: Sing HDuration
 sDuration =
   SData (STyCon sSymbol_Duration)
-    ((SKonst SInt `SEt` SDone) `SPlus` SVoid)
+    (SDone `SPlus`
+     SDone `SPlus`
+     SDone `SPlus`
+     SDone `SPlus`
+     SDone `SPlus`
+     SDone `SPlus`
+     SDone `SPlus`
+     SDone `SPlus`
+     SDone `SPlus`
+     SDone `SPlus`
+     SVoid)
 
 sSymbol_Duration :: Sing "Duration"
 sSymbol_Duration = SingSymbol
 
--- Constructor
-hDuration :: ast 'HInt -> Datum ast HDuration
-hDuration d = Datum "Duration" sDuration (Inl $ Konst d `Et` Done)
-
+-- Constructors
+hDWhole,hWhole,hHalf,hQuarter,hEighth,hSixteenth,hThirtySecond,hSixtyFourth,hOneTwentyEighth,hTwoFiftySixth
+  :: Datum ast HDuration
+hDWhole          = Datum "2*1" sDuration (Inl $ Done)
+hWhole           = Datum "1"   sDuration (Inr . Inl $ Done)
+hHalf            = Datum "2"   sDuration (Inr . Inr . Inl $ Done)
+hQuarter         = Datum "4"   sDuration (Inr . Inr . Inr . Inl $ Done)
+hEighth          = Datum "8"   sDuration (Inr . Inr . Inr . Inr . Inl $ Done)
+hSixteenth       = Datum "16"  sDuration (Inr . Inr . Inr . Inr . Inr . Inl $ Done)
+hThirtySecond    = Datum "32"  sDuration (Inr . Inr . Inr . Inr . Inr . Inr . Inl $ Done)
+hSixtyFourth     = Datum "64"  sDuration (Inr . Inr . Inr . Inr . Inr . Inr . Inr . Inl $ Done)
+hOneTwentyEighth = Datum "128" sDuration (Inr . Inr . Inr . Inr . Inr . Inr . Inr . Inr . Inl $ Done)
+hTwoFiftySixth   = Datum "256" sDuration (Inr . Inr . Inr . Inr . Inr . Inr . Inr . Inr . Inr . Inl $ Done)
 
 --------------------------------------------------------------------------------
 data Primitive
@@ -212,14 +264,14 @@ sSymbol_Music = SingSymbol
 
 maryHadALittleLamb :: Music
 maryHadALittleLamb =
-  let e4 = Prim (Note E [] 4 4 False)
-      e2 = Prim (Note E [] 4 2 False)
+  let e4 = Prim (Note E [] 4 Quarter False)
+      e2 = Prim (Note E [] 4 Half False)
 
-      d4 = Prim (Note D [] 4 4 False)
-      d2 = Prim (Note D [] 4 2 False)
+      d4 = Prim (Note D [] 4 Quarter False)
+      d2 = Prim (Note D [] 4 Half False)
 
-      c4 = Prim (Note C [] 4 4 False)
-      c1 = Prim (Note C [] 4 1 False)
+      c4 = Prim (Note C [] 4 Quarter False)
+      c1 = Prim (Note C [] 4 Whole False)
   in foldr Seq c1 [e4,d4,c4,d4
                   ,e4,e4,e2
                   ,d4,d4,d2
