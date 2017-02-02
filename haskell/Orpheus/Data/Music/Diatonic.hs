@@ -21,6 +21,7 @@ module Orpheus.Data.Music.Diatonic where
 import Language.Hakaru.Syntax.Datum
 import Language.Hakaru.Types.DataKind
 import Language.Hakaru.Types.Sing
+import Data.Vector (Vector)
 
 {-
   Two representations, one in Haskell and one in Hakaru. The one in Haskell is
@@ -236,33 +237,50 @@ sSymbol_Primitive = SingSymbol
 
 
 --------------------------------------------------------------------------------
-data Music
+data Voice
   = Prim Primitive
-  | Seq  Music Music
-  | Par  Music Music
+  | Seq  Voice Voice
+  | Par  Voice Voice
   deriving (Show,Eq,Ord)
 
-type HMusic
-  = 'HData ('TyCon "Music") '[ '[ 'K HPrimitive ] , '[ 'I, 'I ] , '[ 'I, 'I ] ]
+type HVoice
+  = 'HData ('TyCon "Voice") '[ '[ 'K HPrimitive ] , '[ 'I, 'I ] , '[ 'I, 'I ] ]
                              {-       Prim        |   Seq M M   |  Par M M   -}
 
-type instance Code ('TyCon "Music") =
+type instance Code ('TyCon "Voice") =
   '[ '[ 'K HPrimitive ] , '[ 'I, 'I ] , '[ 'I, 'I ] ]
 
-sMusic :: Sing HMusic
-sMusic =
-  SData (STyCon sSymbol_Music)
+sVoice :: Sing HVoice
+sVoice =
+  SData (STyCon sSymbol_Voice)
     ( (SKonst sPrimitive `SEt` SDone)
      `SPlus` (SIdent `SEt` SIdent `SEt` SDone)
      `SPlus` (SIdent `SEt` SIdent `SEt` SDone)
      `SPlus` SVoid)
 
-sSymbol_Music :: Sing "Music"
-sSymbol_Music = SingSymbol
+sSymbol_Voice :: Sing "Voice"
+sSymbol_Voice = SingSymbol
+
+--------------------------------------------------------------------------------
+type Score = Vector Voice
+
+type HScore
+  = 'HData ('TyCon "Score") '[ '[ 'K ('HArray HVoice) ] ]
+
+type instance Code ('TyCon "Score") = '[ '[ 'K ('HArray HVoice) ] ]
+
+sScore :: Sing HScore
+sScore =
+  SData (STyCon sSymbol_Score)
+    ( (SKonst (SArray sVoice) `SEt` SDone) `SPlus` SVoid)
+
+sSymbol_Score :: Sing "Score"
+sSymbol_Score = SingSymbol
+
 
 --------------------------------------------------------------------------------
 
-maryHadALittleLamb :: Music
+maryHadALittleLamb :: Voice
 maryHadALittleLamb =
   let e4 = Prim (Note E [] 4 Quarter False)
       e2 = Prim (Note E [] 4 Half False)
