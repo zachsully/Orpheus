@@ -87,7 +87,7 @@ instance Pretty Duration where
 
 durNumber :: Duration -> Int
 durNumber x =
-  let x' = fromEnum x in
+  let x' = fromEnum x - 1 in
   if x' < 1
   then error "TODO: prett durations longer than whole"
   else 2 ^ x'

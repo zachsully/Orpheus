@@ -36,7 +36,7 @@ main :: IO ()
 --       m3 = runEvaluate $ triv $ geometric (prob_ 0.5)
 --   gen <- MWC.createSystemRandom
 --   forever $ illustrate (SMeasure SNat) gen m3
-main = putStrLn . prettyPrintScore . Score $ Data.Vector.replicate 3 maryHadALittleLamb
+main = putStrLn . prettyPrintScore . Score . singleton $ baBaBlackSheep
 {-
   mDuration is defined recursively and never returns a sample. Should this just
   be modelled with a geometric distribution instead?
