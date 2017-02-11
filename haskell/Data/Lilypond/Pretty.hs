@@ -120,6 +120,6 @@ instance Pretty Voice where
 
 instance Pretty Score where
   pretty (Score s) = vcat $
-    [ text "<<" ]
+    [ text "\\new StaffGroup <<" ]
     ++ (fmap (absoluteWrap . pretty) . toList $ s)
     ++ [ text ">>" ]
