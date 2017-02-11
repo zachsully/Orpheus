@@ -21,7 +21,7 @@ import Text.PrettyPrint
 import Orpheus.Data.Music.Diatonic
 
 prettyPrintScore :: Score -> String
-prettyPrintScore = render . prettyTopLevel                 
+prettyPrintScore = render . prettyTopLevel
 
 prettyTopLevel :: Score -> Doc
 prettyTopLevel m = vcat
@@ -88,7 +88,7 @@ instance Pretty Duration where
 durNumber :: Duration -> Int
 durNumber x =
   let x' = fromEnum x - 1 in
-  if x' < 1
+  if x' < 0
   then error "TODO: prett durations longer than whole"
   else 2 ^ x'
 

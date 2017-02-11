@@ -17,6 +17,13 @@ module Orpheus.Data.Music.Nursery where
 import Orpheus.Data.Music.Diatonic
 import Data.Vector
 
+rhymes :: [Voice]
+rhymes =
+  [ maryHadALittleLamb
+  , baBaBlackSheep
+  , twinkleTwinkleLittleStar
+  ]
+
 maryHadALittleLamb :: Voice
 maryHadALittleLamb =
   let e4 = Note E empty 4 Quarter False
@@ -66,4 +73,32 @@ baBaBlackSheep =
        , e8, e8, e8, e8, d4, r4
        , c4, c4, b4, b4
        , a4, a4, Note G empty 4 Half False
+       ]
+
+twinkleTwinkleLittleStar :: Voice
+twinkleTwinkleLittleStar =
+  let c4 = Note C empty 4 Quarter False
+      c2 = Note C empty 4 Half False
+      g4 = Note G empty 4 Quarter False
+      g2 = Note G empty 4 Half False
+      a4 = Note A empty 4 Quarter False
+      f4 = Note F empty 4 Quarter False
+      e4 = Note E empty 4 Quarter False
+      d4 = Note D empty 4 Quarter False
+      d2 = Note D empty 4 Half False
+  in Voice . fromList . fmap singleton $
+       [ c4, c4, g4, g4
+       , a4, a4, g2
+       , f4, f4, e4, e4
+       , d4, d4, c2
+
+       , g4, g4, f4, f4
+       , e4, e4, d2
+       , g4, g4, f4, f4
+       , e4, e4, d2
+
+       , c4, c4, g4, g4
+       , a4, a4, g2
+       , f4, f4, e4, e4
+       , d4, d4, c2
        ]

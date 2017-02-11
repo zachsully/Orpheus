@@ -24,7 +24,7 @@ import Orpheus.Model.Diatonic
 import qualified Text.PrettyPrint   as PP
 import qualified System.Random.MWC  as MWC
 import Control.Monad
-
+import System.Environment
 import Data.Lilypond.Pretty
 import Orpheus.Data.Music.Nursery
 import Data.Vector
@@ -36,7 +36,13 @@ main :: IO ()
 --       m3 = runEvaluate $ triv $ geometric (prob_ 0.5)
 --   gen <- MWC.createSystemRandom
 --   forever $ illustrate (SMeasure SNat) gen m3
-main = putStrLn . prettyPrintScore . Score . singleton $ baBaBlackSheep
+main = do
+  (x:_) <- getArgs
+  let index = (read x) :: Int
+  putStrLn . prettyPrintScore . Score . singleton $
+    Prelude.head . Prelude.drop index $ rhymes
+
+
 {-
   mDuration is defined recursively and never returns a sample. Should this just
   be modelled with a geometric distribution instead?
