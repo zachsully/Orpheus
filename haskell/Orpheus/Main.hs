@@ -25,13 +25,18 @@ import qualified Text.PrettyPrint   as PP
 import qualified System.Random.MWC  as MWC
 import Control.Monad
 
+import Data.Lilypond.Pretty
+import Orpheus.Data.Music.Nursery
+import Data.Vector
+
 main :: IO ()
-main = do
-  let -- m  = runEvaluate $ triv $ mDuration
-      m2 = runEvaluate $ triv $ categorical (array (nat_ 2) (\_ -> prob_ 0.5))
-      m3 = runEvaluate $ triv $ geometric (prob_ 0.5)
-  gen <- MWC.createSystemRandom
-  forever $ illustrate (SMeasure SNat) gen m3
+-- main = do
+--   let -- m  = runEvaluate $ triv $ mDuration
+--       m2 = runEvaluate $ triv $ categorical (array (nat_ 2) (\_ -> prob_ 0.5))
+--       m3 = runEvaluate $ triv $ geometric (prob_ 0.5)
+--   gen <- MWC.createSystemRandom
+--   forever $ illustrate (SMeasure SNat) gen m3
+main = putStrLn . prettyPrintScore . Score . singleton $ maryHadALittleLamb
 {-
   mDuration is defined recursively and never returns a sample. Should this just
   be modelled with a geometric distribution instead?

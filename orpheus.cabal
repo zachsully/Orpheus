@@ -18,7 +18,7 @@ library
                        Orpheus.Data.Music.Progression,
                        Orpheus.Data.Music.Form,
                        Orpheus.Data.Music.Chord,
-                       Orpheus.Data.Parser,
+                       Orpheus.Data.Music.Nursery,
                        Data.Lilypond.Pretty
 
   other-extensions:    DataKinds, OverloadedStrings, TypeFamilies
@@ -45,6 +45,7 @@ executable orpheus
   build-depends:       base       >= 4.7  && < 5.0,
                        pretty     >= 1.1,
                        mwc-random >= 0.13 && < 0.14,
+                       vector     >= 0.1,
                        hakaru     >= 0.3 && < 0.4,
                        orpheus    >= 0.0
 

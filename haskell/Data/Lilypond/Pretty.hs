@@ -16,15 +16,18 @@
 
 module Data.Lilypond.Pretty where
 
+import Data.Vector (toList)
 import Text.PrettyPrint
 import Orpheus.Data.Music.Diatonic
 
-{-
+prettyPrintScore :: Score -> String
+prettyPrintScore = render . prettyTopLevel                 
+
 prettyTopLevel :: Score -> Doc
 prettyTopLevel m = vcat
   [ header
   , text ""
-  , scoreWrap . absoluteWrap . pretty $ m
+  , scoreWrap . pretty $ m
   ]
 
 header :: Doc
@@ -84,14 +87,15 @@ instance Pretty Duration where
 
 durNumber :: Duration -> Int
 durNumber x =
-  if x < 1
+  let x' = fromEnum x in
+  if x' < 1
   then error "TODO: prett durations longer than whole"
-  else 2 ^ x
+  else 2 ^ x'
 
 instance Pretty Primitive where
   pretty (Note pc acs oct dur dot) =
     hcat $ [ pretty pc
-           , hcat . fmap pretty $ acs
+           , hcat . fmap pretty $ toList acs
            , let dis = octDistance oct in
              hcat . replicate dis $ if dis > 0 then text "'" else comma
            , pretty dur
@@ -106,12 +110,16 @@ octDistance :: Int -> Int
 octDistance i = i - 3
 
 instance Pretty Voice where
-  pretty (Prim p)  = pretty p
-  pretty (Seq m0 m1) = pretty m0 <+> pretty m1
-  pretty (Par m0 m1) = hsep
-    [ text "<"
-    , pretty m0
-    , pretty m1
-    , text ">"
-    ]
--}
+  pretty (Voice v) = hsep $ fmap prettyPar $ toList v
+    where prettyPar ps =
+            if length ps < 2
+            then hcat . fmap pretty . toList $ ps
+            else hsep $ [ text "<" ]
+                     ++ (fmap pretty . toList $ ps)
+                     ++ [ text ">" ]
+
+instance Pretty Score where
+  pretty (Score s) = vcat $
+    [ text "<<" ]
+    ++ (fmap (absoluteWrap . pretty) . toList $ s)
+    ++ [ text ">>" ]

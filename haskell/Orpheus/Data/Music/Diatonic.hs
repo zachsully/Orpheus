@@ -131,7 +131,7 @@ data Duration
   | SixtyFourth
   | OneTwentyEighth
   | TwoFiftySixth
-  deriving (Show,Eq,Ord)
+  deriving (Show,Eq,Ord,Enum)
 
 type HDuration
   = 'HData ('TyCon "Duration") '[ '[]
@@ -192,7 +192,7 @@ hTwoFiftySixth   = Datum "256" sDuration (Inr . Inr . Inr . Inr . Inr . Inr . In
 --------------------------------------------------------------------------------
 data Primitive
   = Note Pitchclass
-         [Accidental]
+         (Vector Accidental)
          Int           -- octive
          Duration
          Bool          -- dotted?
@@ -203,7 +203,7 @@ data Primitive
 type HPrimitive
   = 'HData ('TyCon "Primitive")
            '[ '[ 'K HPitchclass
-               , 'K (HList HAccidental)
+               , 'K ('HArray HAccidental)
                , 'K 'HInt
                , 'K HDuration
                , 'K HBool ]
@@ -212,7 +212,7 @@ type HPrimitive
 
 type instance Code ('TyCon "Primitive") =
   '[ '[ 'K HPitchclass
-      , 'K (HList HAccidental)
+      , 'K ('HArray HAccidental)
       , 'K 'HInt
       , 'K HDuration
       , 'K HBool ]
@@ -223,7 +223,7 @@ sPrimitive :: Sing HPrimitive
 sPrimitive =
   SData (STyCon sSymbol_Primitive)
     ((      (SKonst sPitchclass)
-      `SEt` (SKonst . sList $ sAccidental)
+      `SEt` (SKonst . SArray $ sAccidental)
       `SEt` (SKonst SInt)
       `SEt` (SKonst sDuration)
       `SEt` (SKonst sBool)
@@ -237,32 +237,33 @@ sSymbol_Primitive = SingSymbol
 
 
 --------------------------------------------------------------------------------
-data Voice
-  = Prim Primitive
-  | Seq  Voice Voice
-  | Par  Voice Voice
-  deriving (Show,Eq,Ord)
+{-
+
+Similar to PiSigma types we have Vectors of Vectors of musical primitives. The
+outer Vector is sequential composition. The inner vector is parallel
+composition.
+
+-}
+newtype Voice = Voice (Vector (Vector Primitive))
+  deriving (Show,Eq)
 
 type HVoice
-  = 'HData ('TyCon "Voice") '[ '[ 'K HPrimitive ] , '[ 'I, 'I ] , '[ 'I, 'I ] ]
-                             {-       Prim        |   Seq M M   |  Par M M   -}
+  = 'HData ('TyCon "Voice") '[ '[ 'K ('HArray ('HArray HPrimitive)) ] ]
 
-type instance Code ('TyCon "Voice") =
-  '[ '[ 'K HPrimitive ] , '[ 'I, 'I ] , '[ 'I, 'I ] ]
+type instance Code ('TyCon "Voice") = '[ '[ 'K ('HArray ('HArray HPrimitive)) ] ]
 
 sVoice :: Sing HVoice
 sVoice =
   SData (STyCon sSymbol_Voice)
-    ( (SKonst sPrimitive `SEt` SDone)
-     `SPlus` (SIdent `SEt` SIdent `SEt` SDone)
-     `SPlus` (SIdent `SEt` SIdent `SEt` SDone)
+    ( (SKonst (SArray (SArray sPrimitive)) `SEt` SDone)
      `SPlus` SVoid)
 
 sSymbol_Voice :: Sing "Voice"
 sSymbol_Voice = SingSymbol
 
 --------------------------------------------------------------------------------
-type Score = Vector Voice
+newtype Score = Score (Vector Voice)
+  deriving (Show,Eq)
 
 type HScore
   = 'HData ('TyCon "Score") '[ '[ 'K ('HArray HVoice) ] ]
@@ -279,21 +280,3 @@ sSymbol_Score = SingSymbol
 
 
 --------------------------------------------------------------------------------
-
-maryHadALittleLamb :: Voice
-maryHadALittleLamb =
-  let e4 = Prim (Note E [] 4 Quarter False)
-      e2 = Prim (Note E [] 4 Half False)
-
-      d4 = Prim (Note D [] 4 Quarter False)
-      d2 = Prim (Note D [] 4 Half False)
-
-      c4 = Prim (Note C [] 4 Quarter False)
-      c1 = Prim (Note C [] 4 Whole False)
-  in foldr Seq c1 [e4,d4,c4,d4
-                  ,e4,e4,e2
-                  ,d4,d4,d2
-                  ,e4,e4,e2
-                  ,e4,d4,c4,d4
-                  ,e4,e4,e4,c4
-                  ,d4,d4,e4,d4]
