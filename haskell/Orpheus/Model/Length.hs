@@ -1,4 +1,17 @@
+{-# LANGUAGE DataKinds,
+             FlexibleContexts #-}
+
 module Orpheus.Model.Length where
+
+import Orpheus.Data.Music.Diatonic
+
+import Language.Hakaru.Syntax.Prelude
+import Language.Hakaru.Types.DataKind
+import Language.Hakaru.Syntax.AST
+import Language.Hakaru.Syntax.ABT
+
+import Prelude hiding ((>>=),(==),(/),(+),fromRational)
+
 
 {-
 
@@ -10,23 +23,23 @@ mLength
   :: (ABT Term abt)
   => abt '[] 'HProb
   -> abt '[] 'HProb
-  -> abt '[] ('HMeasure HPrim)
-  -> abt '[] ('HMeasure ('HArray HPrim))
-mLength alpha beta mp =
-  gamma alpha beta >>= \g ->
+  -> abt '[] ('HMeasure HPrimitive)
+  -> abt '[] ('HMeasure ('HArray HPrimitive))
+mLength shape scale mp =
+  gamma shape scale >>= \g ->
     poisson g >>= \n ->
       plate n $ \_ ->
         mp
 
 
-inferGammaLength
+inferGammaPosterior
   :: (ABT Term abt)
   => abt '[] 'HProb
   -> abt '[] 'HProb
-  -> abt '[] ('HArray ('HArray HPrim))
+  -> abt '[] ('HArray ('HArray HPrimitive))
   -> abt '[] (hPair 'HProb 'HProb)
-inferGammaLength alpha beta dataset =
-  let  n = size(dataset)
-       x = (summate i from 0 to (size dataset):
-              size(dataset[i])) / n
-  in pair (x + alpha) (n + beta)
+inferGammaPosterior shape scale dataset = undefined
+  -- let  n = size(dataset)
+  --      x = (summate i from 0 to (size dataset):
+  --             size(dataset[i])) / n
+  -- in pair (x + shape) (n + scale)

@@ -14,6 +14,7 @@ cabal-version:       >=1.10
 
 library
   exposed-modules:     Orpheus.Model.Diatonic,
+                       Orpheus.Model.Length,
                        Orpheus.Data.Music.Diatonic,
                        Orpheus.Data.Music.Progression,
                        Orpheus.Data.Music.Form,
@@ -46,6 +47,7 @@ executable orpheus
                        pretty     >= 1.1,
                        mwc-random >= 0.13 && < 0.14,
                        vector     >= 0.1,
+                       text       >= 1.2,
                        hakaru     >= 0.3 && < 0.4,
                        orpheus    >= 0.0
 

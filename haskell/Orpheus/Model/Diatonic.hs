@@ -35,8 +35,8 @@ measMusic
   -> abt '[] ('HMeasure HVoice)
 measMusic _ _ _ _ _ = undefined
 
-measPrimitive :: (ABT Term abt) => abt '[] ('HMeasure HPrimitive)
-measPrimitive = undefined
+mPrimitive :: (ABT Term abt) => abt '[] ('HMeasure HPrimitive)
+mPrimitive = dirac $ datum_ (hRest hDWhole dFalse)
 
 --------------------------------------------------------------------------------
 catDuration

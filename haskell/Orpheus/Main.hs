@@ -1,4 +1,6 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE DataKinds,
+             FlexibleContexts,
+             GADTs             #-}
 --------------------------------------------------------------------------------
 --                                                                  2017.01.28
 -- |
@@ -18,29 +20,38 @@ import Language.Hakaru.Sample
 import Language.Hakaru.Types.Sing
 import Language.Hakaru.Syntax.Value
 import Language.Hakaru.Syntax.Prelude
+import Language.Hakaru.Syntax.ABT
+import Language.Hakaru.Syntax.AST
 import Language.Hakaru.Pretty.Concrete
+import Language.Hakaru.Pretty.Haskell as HK
+
 import Orpheus.Data.Music.Diatonic
+import Orpheus.Data.Music.Nursery
 import Orpheus.Model.Diatonic
+import Orpheus.Model.Length
+import Data.Lilypond.Pretty
+
+
 import qualified Text.PrettyPrint   as PP
 import qualified System.Random.MWC  as MWC
 import Control.Monad
 import System.Environment
-import Data.Lilypond.Pretty
-import Orpheus.Data.Music.Nursery
 import Data.Vector
+-- import Data.Text (pack)
 
 main :: IO ()
--- main = do
---   let -- m  = runEvaluate $ triv $ mDuration
---       m2 = runEvaluate $ triv $ categorical (array (nat_ 2) (\_ -> prob_ 0.5))
---       m3 = runEvaluate $ triv $ geometric (prob_ 0.5)
---   gen <- MWC.createSystemRandom
---   forever $ illustrate (SMeasure SNat) gen m3
 main = do
-  (x:_) <- getArgs
-  let index = (read x) :: Int
-  putStrLn . prettyPrintScore . Score . singleton $
-    Prelude.head . Prelude.drop index $ rhymes
+  prettyProg $ triv $ mLength (prob_ 0.3) (prob_ 0.5) mPrimitive
+  -- let -- m  = runEvaluate $ triv $ mDuration
+  --     m2 = runEvaluate $ triv $ categorical (array (nat_ 2) (\_ -> prob_ 0.5))
+  --     m3 = runEvaluate $ triv $ geometric (prob_ 0.5)
+  -- gen <- MWC.createSystemRandom
+  -- forever $ illustrate (SMeasure SNat) gen m3
+-- main = do
+--   (x:_) <- getArgs
+--   let index = (read x) :: Int
+--   putStrLn . prettyPrintScore . Score . singleton $
+--     Prelude.head . Prelude.drop index $ rhymes
 
 
 {-
@@ -62,3 +73,14 @@ illustrate _ _ x = render x
 
 render :: Value a -> IO ()
 render = putStrLn . PP.renderStyle PP.style {PP.mode = PP.LeftMode} . prettyValue
+
+
+prettyProg
+  :: (ABT Term abt)
+  => abt '[] a
+  -> IO ()
+prettyProg abt =
+  putStrLn $ PP.renderStyle PP.style {PP.mode = PP.LeftMode}
+    (PP.cat [ PP.text ("prog = ")
+         , PP.nest 2 (HK.pretty abt)
+         ])

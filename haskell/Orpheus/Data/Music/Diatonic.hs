@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds,
+             DeriveGeneric,
              OverloadedStrings,
              TypeFamilies,
              StandaloneDeriving #-}
@@ -22,6 +23,7 @@ import Language.Hakaru.Syntax.Datum
 import Language.Hakaru.Types.DataKind
 import Language.Hakaru.Types.Sing
 import Data.Vector (Vector)
+import GHC.Generics
 
 {-
   Two representations, one in Haskell and one in Hakaru. The one in Haskell is
@@ -32,7 +34,7 @@ import Data.Vector (Vector)
 -}
 --------------------------------------------------------------------------------
 data Pitchclass = A | B | C | D | E | F | G
-  deriving (Show,Eq,Ord,Enum)
+  deriving (Show,Eq,Ord,Enum,Generic)
 
 type HPitchclass =
   'HData ('TyCon "Pitchclass") '[ '[], '[], '[], '[], '[], '[], '[] ]
@@ -70,7 +72,7 @@ data Accidental
   = Sharp
   | Flat
   | Natural
-  deriving (Show,Eq,Ord,Enum)
+  deriving (Show,Eq,Ord,Enum,Generic)
 
 type HAccidental
   = 'HData ('TyCon "Accidental") '[ '[], '[], '[] ]
@@ -131,7 +133,7 @@ data Duration
   | SixtyFourth
   | OneTwentyEighth
   | TwoFiftySixth
-  deriving (Show,Eq,Ord,Enum)
+  deriving (Show,Eq,Ord,Enum,Generic)
 
 type HDuration
   = 'HData ('TyCon "Duration") '[ '[]
@@ -198,7 +200,7 @@ data Primitive
          Bool          -- dotted?
   | Rest Duration
          Bool          -- dotted?
-  deriving (Show,Eq,Ord)
+  deriving (Show,Eq,Ord,Generic)
 
 type HPrimitive
   = 'HData ('TyCon "Primitive")
@@ -235,6 +237,11 @@ sSymbol_Primitive :: Sing "Primitive"
 sSymbol_Primitive = SingSymbol
 
 
+hRest :: ast HDuration -> ast HBool -> Datum ast HPrimitive
+hRest dur bool = undefined -- Datum "Rest" sDuration (Inl $ Done)
+
+
+
 
 --------------------------------------------------------------------------------
 {-
@@ -245,7 +252,7 @@ composition.
 
 -}
 newtype Voice = Voice (Vector (Vector Primitive))
-  deriving (Show,Eq)
+  deriving (Show,Eq,Generic)
 
 type HVoice
   = 'HData ('TyCon "Voice") '[ '[ 'K ('HArray ('HArray HPrimitive)) ] ]
@@ -263,7 +270,7 @@ sSymbol_Voice = SingSymbol
 
 --------------------------------------------------------------------------------
 newtype Score = Score (Vector Voice)
-  deriving (Show,Eq)
+  deriving (Show,Eq,Generic)
 
 type HScore
   = 'HData ('TyCon "Score") '[ '[ 'K ('HArray HVoice) ] ]
