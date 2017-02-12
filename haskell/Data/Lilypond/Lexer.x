@@ -8,6 +8,7 @@ tokens :-
   $white+            ;
   [a-zA-z]           { TokenLetter . read }
   [0-9]+             { TokenDigit . read }
+  \\[a-zA-z]+        { TokenCmd }
   \<\<               { const TokenDoubleLeftAngleBracket }
   \>\>               { const TokenDoubleRightAngleBracket }
   \<                 { const TokenLeftAngleBracket }
@@ -35,5 +36,7 @@ data Token
   | TokenRightParen
   | TokenPercent
   | TokenBackSlash
+  | TokenDoubleBackSlash
+  | TokenCmd String
   deriving (Show)
 }

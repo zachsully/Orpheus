@@ -12,36 +12,38 @@ import Control.Monad.State
 %monad { State Int } { (>>=) } { return }
 %error { parseError }
 %token
-        "<<"  { TokenDoubleLeftAngleBracket }
-        ">>"  { TokenDoubleRightAngleBracket }
-        '<'   { TokenLeftAngleBracket }
-        '>'   { TokenRightAngleBracket }
-        '{'   { TokenLeftBrace }
-        '}'   { TokenRightBrace }
-        '('   { TokenLeftParen }
-        ')'   { TokenRightParen }
-        '%'   { TokenPercent }
-        '\\'  { TokenBackSlash }
-        int   { TokenDigit $$ }
-        let   { TokenLetter $$ }
-        sym   { TokenSym $$ }
+        "<<"   { TokenDoubleLeftAngleBracket }
+        ">>"   { TokenDoubleRightAngleBracket }
+        '<'    { TokenLeftAngleBracket }
+        '>'    { TokenRightAngleBracket }
+        '{'    { TokenLeftBrace }
+        '}'    { TokenRightBrace }
+        '('    { TokenLeftParen }
+        ')'    { TokenRightParen }
+        '%'    { TokenPercent }
+        '\\'   { TokenBackSlash }
+        int    { TokenDigit $$ }
+        letter { TokenLetter $$ }
+        sym    { TokenSym $$ }
 
 %%
 
-PitCl : let           { \p -> if elem $1 "abcdefg"
-                              then $1
-                              else parseError p }
+PitCl : letter                  { \p -> if elem $1 "abcdefg"
+                                        then $1
+                                        else parseError p }
 
-Acc   : sym           { const "foo" }
+Acc   : sym                     { const "foo" }
 
-Dur   : int           { const "foo" }
+Dur   : int                     { const "foo" }
 
-Prim  : int '%'       { const "foo" }
-      | sym '>'       { const "foo" }
+Prim  : int '%'                 { const "foo" }
+      | sym '>'                 { const "foo" }
 
+ScoreCmd : int '\\'             { const "foo" }
 
+Staffs : sym '\\'               { const "foo" }
 
-Score : "<<" ">>"     { const V.empty }
+Score : ScoreCmd '{' Staffs '}' { const V.empty }
 
 {
 parseError :: [Token] -> a
