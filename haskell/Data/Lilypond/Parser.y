@@ -9,7 +9,7 @@ import Control.Monad.State
 
 %name lily
 %tokentype { Token }
-%monad { State Int } { (>>=) } { return }
+%monad { State (Maybe (Pitchclass,Int)) } { (>>=) } { return }
 %error { parseError }
 %token
         "<<"   { TokenDoubleLeftAngleBracket }
