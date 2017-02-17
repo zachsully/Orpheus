@@ -32,3 +32,11 @@ simplist tool to produce sound from our model.
               v
        Generate CSound
 ```
+
+## Questions to Ask the Data
+
+* how long are the pieces?
+* given a set of pieces, generate another
+* find the key center of a piece
+* given a sequence of `n` pieces, generate an `n+1` piece
+* given a corpus and a subset of pieces, find the most probable author
