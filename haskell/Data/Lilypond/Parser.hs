@@ -10,7 +10,7 @@ type Parser = ParsecT String () IO
 
 parseLilyString :: String -> IO Score
 parseLilyString s = do
-  ep <- runParserT pScore () "lilypond" s
+  ep <- runParserT pLilypond () "lilypond" s
   case ep of
     Left  e     -> error $ show e
     Right score -> return score
@@ -41,6 +41,7 @@ Notes for the lilypond parser:
 * some lilypond statements require read in other files and tokenizing them
 * we have to know the keysigniture in order to know what the sharps and flats
   are
+
 --}
 
 data MState = MState
@@ -54,6 +55,76 @@ data Clef
   | CClef -- Alto,   C4
   | FClef -- Bass,   F3
   deriving (Show,Eq)
+
+pLilypond :: Parser Score
+pLilypond = try (pHeader >> pLilypond)
+        <|> try (pLayout >> pLilypond)
+        <|> try (pMidi   >> pLilypond)
+        <|> pScore
+
+--------------------------------------------------------------------------------
+{-
+
+For now these bits of data are thrown out
+
+-}
+
+pHeader :: Parser ()
+pHeader = undefined
+
+pLayout :: Parser ()
+pLayout = undefined
+
+pMidi :: Parser ()
+pMidi = undefined
+
+pStaff :: Parser ()
+pStaff = undefined
+
+pNew :: Parser ()
+pNew = undefined
+
+pSet :: Parser ()
+pSet = undefined
+
+pOverride :: Parser ()
+pOverride = undefined
+
+pWith :: Parser ()
+pWith = undefined
+
+pPaper :: Parser ()
+pPaper = undefined
+
+pRemove :: Parser ()
+pRemove = undefined
+
+pInclude :: Parser ()
+pInclude = undefined
+
+pVersion :: Parser ()
+pVersion = undefined
+
+--------------------------------------------------------------------------------
+{-
+-}
+
+pVar :: Parser String
+pVar = undefined
+
+--------------------------------------------------------------------------------
+--                           Musical Information                              --
+--------------------------------------------------------------------------------
+
+pRelative :: Parser MState
+pRelative = undefined
+
+pAbsolute :: Parser MState
+pAbsolute = undefined
+
+-- clef does not effect the symbolic information
+pClef :: Parser ()
+pClef = undefined
 
 pTimeSignature :: MState -> Parser MState
 pTimeSignature = undefined
