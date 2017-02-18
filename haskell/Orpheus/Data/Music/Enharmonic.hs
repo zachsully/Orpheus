@@ -6,7 +6,7 @@
 --------------------------------------------------------------------------------
 --                                                                  2017.01.11
 -- |
--- Module      :  Orpheus.Data.Music.Diatonic
+-- Module      :  Orpheus.Data.Music.Enharmonic
 -- Copyright   :  Copyright (c) 2017 Zach Sullivan
 -- License     :  BSD3
 -- Maintainer  :  zsulliva@cs.uoregon.edu
@@ -17,7 +17,7 @@
 --
 --------------------------------------------------------------------------------
 
-module Orpheus.Data.Music.Diatonic where
+module Orpheus.Data.Music.Enharmonic where
 
 import Language.Hakaru.Syntax.Datum
 import Language.Hakaru.Types.DataKind
@@ -240,15 +240,8 @@ sSymbol_Primitive = SingSymbol
 hRest :: ast HDuration -> ast HBool -> Datum ast HPrimitive
 hRest dur bool = undefined -- Datum "Rest" sDuration (Inl $ Done)
 
---------------------------------------------------------------------------------
 
-data TimeSig = TimeSig Int Int
-  deriving (Show,Eq,Generic)
 
-data KeySig
-  = Major Pitchclass
-  | Minor Pitchclass
-  deriving (Show,Eq,Generic)
 
 --------------------------------------------------------------------------------
 {-

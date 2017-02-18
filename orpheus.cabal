@@ -16,6 +16,7 @@ library
   exposed-modules:     Orpheus.Model.Diatonic,
                        Orpheus.Model.Length,
                        Orpheus.Data.Music.Diatonic,
+                       Orpheus.Data.Music.Enharmonic,
                        Orpheus.Data.Music.Progression,
                        Orpheus.Data.Music.Form,
                        Orpheus.Data.Music.Chord,
@@ -33,8 +34,6 @@ library
                        mwc-random >= 0.13 && < 0.14,
                        array      >= 0.5,
                        mtl        >= 2.2
-  -- build-tools:         alex, happy
-  -- other-modules:       Data.Lilypond.Lexer
 
   hs-source-dirs:      haskell
   default-language:    Haskell2010
