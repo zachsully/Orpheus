@@ -1,7 +1,7 @@
 name:                orpheus
 version:             0.0.1.0
 synopsis:            Music analysis
-description:         A ]library for probabilistic music analysis
+description:         A library for probabilistic music analysis
 homepage:            zachsully.com
 license:             BSD3
 license-file:        LICENSE
