@@ -93,7 +93,7 @@ durNumber x =
   else 2 ^ x'
 
 instance Pretty Primitive where
-  pretty (Note pc acs oct dur dot) =
+  pretty (Note pc acs _ _ oct dur dot) =
     hcat $ [ pretty pc
            , hcat . fmap pretty $ toList acs
            , let dis = octDistance oct in
@@ -101,7 +101,7 @@ instance Pretty Primitive where
            , pretty dur
            ]
         ++ (if dot then [text "."] else [])
-  pretty (Rest dur dot) =
+  pretty (Rest _ dur dot) =
     hcat $ [ text "r" , pretty dur ]
         ++ (if dot then [text "."] else [])
 

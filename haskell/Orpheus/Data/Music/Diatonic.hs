@@ -195,10 +195,13 @@ hTwoFiftySixth   = Datum "256" sDuration (Inr . Inr . Inr . Inr . Inr . Inr . In
 data Primitive
   = Note Pitchclass
          (Vector Accidental)
+         KeySig
+         TimeSig
          Int           -- octive
          Duration
          Bool          -- dotted?
-  | Rest Duration
+  | Rest TimeSig
+         Duration
          Bool          -- dotted?
   deriving (Show,Eq,Ord,Generic)
 
@@ -236,19 +239,24 @@ sPrimitive =
 sSymbol_Primitive :: Sing "Primitive"
 sSymbol_Primitive = SingSymbol
 
-
 hRest :: ast HDuration -> ast HBool -> Datum ast HPrimitive
 hRest dur bool = undefined -- Datum "Rest" sDuration (Inl $ Done)
 
 --------------------------------------------------------------------------------
 
 data TimeSig = TimeSig Int Int
-  deriving (Show,Eq,Generic)
+  deriving (Show,Eq,Ord,Generic)
+
+commonTime :: TimeSig
+commonTime = TimeSig 4 4
 
 data KeySig
   = Major Pitchclass
   | Minor Pitchclass
-  deriving (Show,Eq,Generic)
+  deriving (Show,Eq,Ord,Generic)
+
+cMajor :: KeySig
+cMajor = Major C
 
 --------------------------------------------------------------------------------
 {-

@@ -26,14 +26,14 @@ rhymes =
 
 maryHadALittleLamb :: Voice
 maryHadALittleLamb =
-  let e4 = Note E empty 4 Quarter False
-      e2 = Note E empty 4 Half False
+  let e4 = Note E empty cMajor commonTime 4 Quarter False
+      e2 = Note E empty cMajor commonTime 4 Half False
 
-      d4 = Note D empty 4 Quarter False
-      d2 = Note D empty 4 Half False
+      d4 = Note D empty cMajor commonTime 4 Quarter False
+      d2 = Note D empty cMajor commonTime 4 Half False
 
-      c4 = Note C empty 4 Quarter False
-      c1 = Note C empty 4 Whole False
+      c4 = Note C empty cMajor commonTime 4 Quarter False
+      c1 = Note C empty cMajor commonTime 4 Whole False
 
   in Voice . fromList . fmap singleton $
        [ e4, d4, c4, d4
@@ -48,16 +48,16 @@ maryHadALittleLamb =
 
 baBaBlackSheep :: Voice
 baBaBlackSheep =
-  let g4 = Note G empty 4 Quarter False
-      d4 = Note D empty 5 Quarter False
-      r4 = Rest Quarter False
-      c4 = Note C empty 5 Quarter False
-      b4 = Note B empty 4 Quarter False
-      a4 = Note A empty 4 Quarter False
-      e8 = Note E empty 5 Eighth  False
-      d8 = Note D empty 5 Eighth  False
-      b8 = Note B empty 4 Eighth  False
-      c8 = Note C empty 5 Eighth  False
+  let g4 = Note G empty cMajor commonTime 4 Quarter False
+      d4 = Note D empty cMajor commonTime 5 Quarter False
+      r4 = Rest commonTime Quarter False
+      c4 = Note C empty cMajor commonTime 5 Quarter False
+      b4 = Note B empty cMajor commonTime 4 Quarter False
+      a4 = Note A empty cMajor commonTime 4 Quarter False
+      e8 = Note E empty cMajor commonTime 5 Eighth  False
+      d8 = Note D empty cMajor commonTime 5 Eighth  False
+      b8 = Note B empty cMajor commonTime 4 Eighth  False
+      c8 = Note C empty cMajor commonTime 5 Eighth  False
   in Voice . fromList . fmap singleton $
        [ g4, g4, d4, d4
        , e8, e8, e8, e8, d4, r4
@@ -72,20 +72,20 @@ baBaBlackSheep =
        , g4, g4, d4, d4
        , e8, e8, e8, e8, d4, r4
        , c4, c4, b4, b4
-       , a4, a4, Note G empty 4 Half False
+       , a4, a4, Note G empty cMajor commonTime 4 Half False
        ]
 
 twinkleTwinkleLittleStar :: Voice
 twinkleTwinkleLittleStar =
-  let c4 = Note C empty 4 Quarter False
-      c2 = Note C empty 4 Half False
-      g4 = Note G empty 4 Quarter False
-      g2 = Note G empty 4 Half False
-      a4 = Note A empty 4 Quarter False
-      f4 = Note F empty 4 Quarter False
-      e4 = Note E empty 4 Quarter False
-      d4 = Note D empty 4 Quarter False
-      d2 = Note D empty 4 Half False
+  let c4 = Note C empty cMajor commonTime 4 Quarter False
+      c2 = Note C empty cMajor commonTime 4 Half False
+      g4 = Note G empty cMajor commonTime 4 Quarter False
+      g2 = Note G empty cMajor commonTime 4 Half False
+      a4 = Note A empty cMajor commonTime 4 Quarter False
+      f4 = Note F empty cMajor commonTime 4 Quarter False
+      e4 = Note E empty cMajor commonTime 4 Quarter False
+      d4 = Note D empty cMajor commonTime 4 Quarter False
+      d2 = Note D empty cMajor commonTime 4 Half False
   in Voice . fromList . fmap singleton $
        [ c4, c4, g4, g4
        , a4, a4, g2
