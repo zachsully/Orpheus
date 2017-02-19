@@ -15,22 +15,24 @@ parseLilyString s = do
     Left  e     -> error $ show e
     Right score -> return score
 
-pitchclassNames :: [String]
+pitchclassNames,objs,cmdNames :: [String]
 pitchclassNames = ["a","b","c","d","e","f","g"]
+objs = ["StaffGroup","Staff","GrandStaff","bass","treble"]
+cmdNames = ["time","absolute","relative","new","repeat"]
 
 lex :: GenTokenParser String st IO
 lex = makeTokenParser $ LanguageDef
   { commentStart    = "%{"
   , commentEnd      = "%}"
   , nestedComments  = False
-  , identStart      = letter <|> char '_'
-  , identLetter     = alphaNum <|> oneOf "_'"
-  , opStart         = oneOf "!$%&*+./<=>?@\\^|-~"
-  , opLetter        = oneOf "!$%&*+./<=>?@\\^|-~"
+  , identStart      = letter
+  , identLetter     = alphaNum
+  , opStart         = oneOf "\\'"
+  , opLetter        = alphaNum
   , caseSensitive   = True
   , commentLine     = "%"
-  , reservedOpNames = []
-  , reservedNames   = pitchclassNames
+  , reservedOpNames = cmdNames
+  , reservedNames   = pitchclassNames ++ objs
   }
 
 
@@ -46,8 +48,9 @@ Notes for the lilypond parser:
 
 data MState = MState
   { clef             :: Clef
-  , keySig           :: (Pitchclass,Bool) -- bool for major and minor
-  , isRelativeOctave :: Maybe Int   }
+  , keySig           :: KeySig
+  , timeSig          :: TimeSig
+  , isRelativeOctave :: Maybe Int }
   deriving Show
 
 data Clef
@@ -105,9 +108,10 @@ pInclude = undefined
 pVersion :: Parser ()
 pVersion = undefined
 
+pScheme :: Parser ()
+pScheme = undefined
+
 --------------------------------------------------------------------------------
-{-
--}
 
 pVar :: Parser String
 pVar = undefined
@@ -117,10 +121,22 @@ pVar = undefined
 --------------------------------------------------------------------------------
 
 pRelative :: Parser MState
-pRelative = undefined
+pRelative = do
+  reserved lex "relative"
+  return $ MState GClef (Major C) commonTime (Just 4)
 
 pAbsolute :: Parser MState
-pAbsolute = undefined
+pAbsolute = do
+  reserved lex "absolute"
+  return $ MState GClef (Major C) commonTime (Just 4)
+
+-- will not consider this for now
+pChordmode :: Parser ()
+pChordmode = undefined
+
+-- will not consider this for now
+pTranspose :: Parser ()
+pTranspose = undefined
 
 -- clef does not effect the symbolic information
 pClef :: Parser ()
@@ -149,7 +165,12 @@ pAccidental = try (reserved lex "is" >> return Sharp)
 pDuration :: MState -> Parser Duration
 pDuration = undefined
 
--- | Which not is parsed will depend on \relative tags and the key signature
+{-
+Absolute: The octave is given with every pitchclass
+Relative:
+* if no octive mark is given, the octave is given as less than a fifth
+* within chords the next note is given relative to the preceding
+-}
 pNote :: MState -> Parser Primitive
 pNote = undefined
 
@@ -162,7 +183,7 @@ pPrimitive = try (pNote undefined)
 
 pVoice :: Parser Voice
 pVoice = undefined
-  -- Voice . V.fromList <$> many1 pPrimitive
+  --  Voice . V.fromList <$> many1 pPrimitive
 
 pScore :: Parser Score
 pScore = Score . V.fromList <$> many1 pVoice
