@@ -1,16 +1,7 @@
-DATADIR = data
+data : mutopia
 
-build:
-	sbt update; sbt compile; cabal build
+mutopia:
+	"git clone git@github.com:MutopiaProject/MutopiaProject.git"
 
-data: dataDir
-	git clone git@github.com:MutopiaProject/MutopiaProject.git
-
-dataDir:
-	mkdir -p data;
-
-wipeData:
-	rm -rf data;
-
-clean:
-	sbt clean; cabal clean; rm -rf dist target *~
+bachMusicXML:
+	"git clone git@github.com:jshanley/bach-chorales.git"
