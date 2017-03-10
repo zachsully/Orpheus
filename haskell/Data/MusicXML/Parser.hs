@@ -64,7 +64,9 @@ arrOctave = arr id /> hasName "octave" /> getText
 arrDuration :: (ArrowXml a) => a XmlTree (Duration,Bool)
 arrDuration = arr id /> hasName "duration" /> getText
           >>> arr (\s -> case s of
+                          "24"  -> (DWhole,True)
                           "16"  -> (DWhole,False)
+                          "12"  -> (Whole,True)
                           "8"   -> (Whole,False)
                           "6"   -> (Half,True)
                           "4"   -> (Half,False)
