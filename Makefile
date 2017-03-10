@@ -1,7 +1,10 @@
-data : mutopia
+data : mutopia bachMusicXML
 
-mutopia:
-	"git clone git@github.com:MutopiaProject/MutopiaProject.git"
+mutopia: dir
+	cd data; git clone git@github.com:MutopiaProject/MutopiaProject.git
 
-bachMusicXML:
-	"git clone git@github.com:jshanley/bach-chorales.git"
+bachMusicXML: dir
+	cd data; git clone git@github.com:jshanley/bach-chorales.git
+
+dir:
+	mkdir -p data
