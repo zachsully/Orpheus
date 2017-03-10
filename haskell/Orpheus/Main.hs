@@ -16,7 +16,7 @@
 
 module Main where
 
-import Language.Hakaru.Sample
+-- import Language.Hakaru.Sample
 import Language.Hakaru.Types.Sing
 import Language.Hakaru.Syntax.Value
 import Language.Hakaru.Syntax.ABT
