@@ -1,6 +1,6 @@
-{-# LANGUAGE DataKinds,
-             FlexibleContexts,
-             GADTs             #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GADTs #-}
 --------------------------------------------------------------------------------
 --                                                                  2017.01.28
 -- |
@@ -19,7 +19,6 @@ module Main where
 import Language.Hakaru.Sample
 import Language.Hakaru.Types.Sing
 import Language.Hakaru.Syntax.Value
-import Language.Hakaru.Syntax.Prelude
 import Language.Hakaru.Syntax.ABT
 import Language.Hakaru.Syntax.AST
 import Language.Hakaru.Pretty.Concrete
@@ -30,7 +29,7 @@ import Orpheus.Data.Music.Nursery
 import Orpheus.Model.Diatonic
 import Orpheus.Model.Length
 import Data.Lilypond.Pretty
-
+import Data.MusicXML.Parser
 
 import qualified Text.PrettyPrint   as PP
 import qualified System.Random.MWC  as MWC
@@ -41,7 +40,9 @@ import Data.Vector
 
 main :: IO ()
 main = do
-  prettyProg $ triv $ mLength (prob_ 0.3) (prob_ 0.5) mPrimitive
+  (fp:[]) <- getArgs
+  xmlParseTest fp
+  -- prettyProg $ triv $ mLength (prob_ 0.3) (prob_ 0.5) mPrimitive
   -- let -- m  = runEvaluate $ triv $ mDuration
   --     m2 = runEvaluate $ triv $ categorical (array (nat_ 2) (\_ -> prob_ 0.5))
   --     m3 = runEvaluate $ triv $ geometric (prob_ 0.5)
@@ -52,6 +53,9 @@ main = do
 --   let index = (read x) :: Int
 --   putStrLn . prettyPrintScore . Score . singleton $
 --     Prelude.head . Prelude.drop index $ rhymes
+
+xmlParseTest :: FilePath -> IO ()
+xmlParseTest fp =  putStrLn =<< show <$> parseMusicXMLFile fp
 
 
 {-

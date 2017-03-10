@@ -1,42 +1,78 @@
 module Data.MusicXML.Parser where
 
+import Control.Monad.Identity
+import Control.Monad
+import Data.Vector (fromList, Vector)
 import Orpheus.Data.Music.Diatonic
 import Text.XML.Light
+import Text.Parsec
 
-newtype Parser s a = Parser { parse :: [s] -> [(a,[s])] }
+--------------------------------------------------------------------------------
+type Parser = ParsecT [Content] () Identity
 
-runParser :: Parser s a -> [s] -> a
-runParser p d =
-  case parse p d of
-    [(res,[])] -> res
-    [(_,(_:_))] -> error "MusicXML parser did not consume entire string"
-    _ -> error "MusicXML parser error"
-   
+prim :: Parser Content
+prim = tokenPrim show (\pos _ _ -> pos) Just
+
+satisfy' :: (Content -> Bool) -> Parser Content
+satisfy' pred = prim >>= \p ->
+  case pred p of
+    True -> return p
+    False -> parserFail "does not satisfy"
+
+
+--------------------------------------------------------------------------------
 parseMusicXMLFile :: FilePath -> IO Score
 parseMusicXMLFile fp = do
   contents <- readFile fp
   let musXML = parseXML contents
-      musXML' = head $ drop 4 musXML
-  return (runParser parseScore [musXML'])
+      (Identity musXML') = runParserT parseTopLevel () fp musXML
+  case musXML' of
+    (Left e) -> error $ "MusicXML parser error: " ++ show e
+    (Right s) -> return s
 
-parseScore :: Parser Content Score
-parseScore = undefined           
--- parseScore (Elem x) = parseScorePartwise x
--- parseScore (Text _) = mempty
--- parseScore (CRef _) = mempt
+isUnused :: Content -> Bool
+isUnused (Elem e) = elem (qName . elName $ e) ["?xml"]
+isUnused (Text _) = True
+isUnused (CRef _) = True
+isUnused _ = False
 
--- parseScorePartwise :: Element -> Parser Content Score
--- parseScorePartwise (Element qname _ content _) =
---   let partListC = head $ drop 3 content
---       num       = parseNumParts partListC
---       dataset   = head $ drop 11 content
---   in error $ show num -- error $ ppContent $
+parseUnused :: Parser ()
+parseUnused = try $ do
+  p <- prim
+  if isUnused p
+  then return ()
+  else parserFail "marco"
 
--- parseNumParts :: Content -> Parser Content Int
--- parseNumParts (Elem (Element _ _ c _)) =
---   let c' = head $ drop 3 c
---   in error $ ppContent c'
--- parseNumParts _ = error "Data.MusicXML.Parser.parseNumParts: should be XML elements"
+-- throw away information we do not car about
+munge :: Parser ()
+munge = skipMany parseUnused
 
--- parsePart :: Element -> Voice
--- parsePart = undefined
+parseTopLevel :: Parser Score
+parseTopLevel = munge >> parseScorePartwise
+
+
+parseScorePartwise :: Parser Score
+parseScorePartwise = do
+  p <- prim
+  case p of
+    return . Score . (runParser parseScorePartwise') $ cs
+  return (Score . fromList $ [])
+
+  -- case qName q of
+  --   "score-partwise" -> return . Score . (runParser parseScorePartwise') $ cs
+  --   _ -> mzero
+
+-- parseScorePartwise' :: Parser Content (Vector Voice)
+-- parseScorePartwise' = do
+--   -- text
+--   -- _ <- element
+--   -- text
+--   -- _ <- parsePartList
+--   -- many text
+--   -- vs <- many element
+--   return $ fromList []
+
+-- parsePart :: Parser Content Voice
+-- parsePart = do
+--   e <- element
+--   return (Voice (fromList []))
