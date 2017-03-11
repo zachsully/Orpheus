@@ -6,7 +6,7 @@ import Orpheus.Data.Music.Context
 import Text.XML.HXT.Core
 
 --------------------------------------------------------------------------------
-parseMusicXMLFile :: FilePath -> IO Score
+parseMusicXMLFile :: FilePath -> IO (Score (KeySig,TimeSig))
 parseMusicXMLFile fp = do
   score <- runX $ readDocument [ withValidate         False
                                , withSubstDTDEntities False
@@ -20,15 +20,19 @@ parseMusicXMLFile fp = do
 
 --------------------------------------------------------------------------------
 
-arrScorePartwise :: (ArrowXml a) => a XmlTree Score
+arrScorePartwise :: (ArrowXml a) => a XmlTree (Score (KeySig,TimeSig))
 arrScorePartwise = arr id /> hasName "score-partwise"
                >>> listA arrPart
                >>> arr (Score . fromList)
 
-arrPart :: (ArrowXml a) => a XmlTree Voice
+arrPart :: (ArrowXml a) => a XmlTree (Part (KeySig,TimeSig))
 arrPart = arr id /> hasName "part"
       >>> listA arrMeasure
-      >>> arr (Voice . singleton . fromList . concat)
+      >>> arr (Part . singleton . fromList . concat)
+
+arrContext :: (ArrowXml a) => a XmlTree (KeySig,TimeSig,Int)
+arrContext = arr id /> hasName "attributes"
+         >>> (arrKey &&& arrTime &&& arrDivisions)
 
 arrDivision :: (ArrowXml a) => a XmlTree Int
 arrDivision = arr id /> hasName "divisions"
@@ -45,17 +49,24 @@ arrTime :: (ArrowXml a) => a XmlTree TimeSig
 arrTime = arr id /> hasName "time"
      >>> ((arr id /> hasName "beats" /> getText) &&&
           (arr id /> hasName "beat-type" /> getText))
-     >>> arr (\(_,_) -> undefined)
+     >>> arr (\(b,bt) -> TimeSig b bt)
+
+arrVoice :: (ArrowXml a) => a XmlTree (Voice (KeySig,TimeSig))
+arrVoice = undefined
 
 arrMeasure :: (ArrowXml a) => a XmlTree [Primitive]
 arrMeasure = arr id /> hasName "measure"
-         >>> listA arrNote
+         >>> listA arrPrimitive
 
-arrNote :: (ArrowXml a) => a XmlTree Primitive
-arrNote = arr id /> hasName "note"
-      >>> (arrPitch &&& arrDuration)
-      >>> arr (\((p,oct), (dur,dot)) ->
-                Note p mempty cMajor commonTime oct dur dot)
+arrPrimitive :: (ArrowXml a) => a XmlTree Primitive
+arrPrimitive = arr id /> hasName "note"
+           >>> (arrNote ||| arrRest)
+
+arrRest :: (ArrowXml a) => a XmlTree Primitive
+arrRest = arr id /> hasName "note"
+      >>> hasName "rest"
+      >>> arrDuration
+      >>^ Rest
 
 arrPitch :: (ArrowXml a) => a XmlTree (Pitchclass,Int)
 arrPitch = arr id /> hasName "pitch"
@@ -77,17 +88,9 @@ arrOctave :: (ArrowXml a) => a XmlTree Int
 arrOctave = arr id /> hasName "octave" /> getText
         >>> arr (read :: String -> Int)
 
--- duration depends of divisions tag, which we will ignore here
-arrDuration :: (ArrowXml a) => a XmlTree (Duration,Bool)
-arrDuration = arr id /> hasName "duration" /> getText
-          >>> arr (\s -> case s of
-                          "24"  -> (DWhole,True)
-                          "16"  -> (DWhole,False)
-                          "12"  -> (Whole,True)
-                          "8"   -> (Whole,False)
-                          "6"   -> (Half,True)
-                          "4"   -> (Half,False)
-                          "3"   -> (Quarter,True)
-                          "2"   -> (Quarter,False)
-                          "1"   -> (Eighth,False)
-                          _     -> error $ "Unrecognized duration: " ++ s)
+-- divisions per quarter note
+arrDuration :: (ArrowXml a) => Int -> a XmlTree Duration
+arrDuration divisions = arr id /> hasName "duration" /> getText
+          >>> arr (\s -> case (read s :: Rational) of
+                          x -> Duration x
+                          _ -> error $ "Unrecognized duration: " ++ s)

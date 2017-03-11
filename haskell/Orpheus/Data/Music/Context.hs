@@ -15,7 +15,7 @@ data Part context = Part (Voice context)
 
 -- In pieces without KeySig or TimeSig changes the outer list will just have
 -- a single element
-data Voice context = [(Context,[[Primitive]])]
+data Voice context = Voice [(context,[[Primitive]])]
   deriving (Show,Eq)
 
 --------------------------------------------------------------------------------
@@ -57,10 +57,12 @@ data Accidental
   | Natural
   deriving (Show,Eq)
 
-data Duration = Duration Int
+data Duration = Duration Rational
   deriving (Show,Eq,Ord)
 
+type Octave = Int  
+
 data Primitive
-  = Note Pitchclass Int Accidental Duration
+  = Note Pitchclass Octave Accidental Duration
   | Rest Duration
   deriving (Show,Eq)
