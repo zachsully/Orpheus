@@ -2,7 +2,7 @@
 module Data.MusicXML.Parser where
 
 import Data.Vector (fromList, singleton)
-import Orpheus.Data.Music.Diatonic
+import Orpheus.Data.Music.Context
 import Text.XML.HXT.Core
 
 --------------------------------------------------------------------------------
@@ -29,6 +29,23 @@ arrPart :: (ArrowXml a) => a XmlTree Voice
 arrPart = arr id /> hasName "part"
       >>> listA arrMeasure
       >>> arr (Voice . singleton . fromList . concat)
+
+arrDivision :: (ArrowXml a) => a XmlTree Int
+arrDivision = arr id /> hasName "divisions"
+          >>> getText
+          >>> arr (read :: a -> Int)
+
+arrKey :: (ArrowXml a) => a XmlTree KeySig
+arrKey = arr id /> hasName "key"
+     >>> ((arr id /> hasName "fifths" /> getText) &&&
+          (arr id /> hasName "mode" /> getText))
+     >>> arr (\(_,_) -> undefined)
+
+arrTime :: (ArrowXml a) => a XmlTree TimeSig
+arrTime = arr id /> hasName "time"
+     >>> ((arr id /> hasName "beats" /> getText) &&&
+          (arr id /> hasName "beat-type" /> getText))
+     >>> arr (\(_,_) -> undefined)
 
 arrMeasure :: (ArrowXml a) => a XmlTree [Primitive]
 arrMeasure = arr id /> hasName "measure"
