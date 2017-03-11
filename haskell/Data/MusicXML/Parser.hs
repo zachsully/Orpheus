@@ -19,25 +19,33 @@ parseMusicXMLFile fp = do
     _ -> error $ show $ score
 
 --------------------------------------------------------------------------------
+-- Score Partwise captures the whole score
 
 arrScorePartwise :: (ArrowXml a) => a XmlTree (Score (KeySig,TimeSig))
 arrScorePartwise = arr id /> hasName "score-partwise"
                >>> listA arrPart
                >>> arr (Score . fromList)
 
+-- A part is probably a single instrument
 arrPart :: (ArrowXml a) => a XmlTree (Part (KeySig,TimeSig))
 arrPart = arr id /> hasName "part"
       >>> listA arrMeasure
       >>> arr (Part . singleton . fromList . concat)
 
+-- A voice will be a single instrument and can contain chords
+arrVoice :: (ArrowXml a) => a XmlTree (Voice (KeySig,TimeSig))
+arrVoice = undefined
+
+-- A context here, represents the KeySignature,TimeSignature and the base note
+-- divisions.
 arrContext :: (ArrowXml a) => a XmlTree (KeySig,TimeSig,Int)
 arrContext = arr id /> hasName "attributes"
          >>> (arrKey &&& arrTime &&& arrDivisions)
 
-arrDivision :: (ArrowXml a) => a XmlTree Int
-arrDivision = arr id /> hasName "divisions"
-          >>> getText
-          >>> arr (read :: a -> Int)
+arrDivisions :: (ArrowXml a) => a XmlTree Int
+arrDivisions = arr id /> hasName "divisions"
+           >>> getText
+           >>^ read
 
 arrKey :: (ArrowXml a) => a XmlTree KeySig
 arrKey = arr id /> hasName "key"
@@ -47,25 +55,33 @@ arrKey = arr id /> hasName "key"
 
 arrTime :: (ArrowXml a) => a XmlTree TimeSig
 arrTime = arr id /> hasName "time"
-     >>> ((arr id /> hasName "beats" /> getText) &&&
-          (arr id /> hasName "beat-type" /> getText))
+     >>> ((arr id /> hasName "beats" /> getText >>^ read) &&&
+          (arr id /> hasName "beat-type" /> getText >>^ read))
      >>> arr (\(b,bt) -> TimeSig b bt)
 
-arrVoice :: (ArrowXml a) => a XmlTree (Voice (KeySig,TimeSig))
-arrVoice = undefined
+-- measures are sequences of notes, they can contain attributes including
+-- contexts for the next sequence of notes
+arrMeasure :: (ArrowXml a) => Int -> a XmlTree [Primitive]
+arrMeasure divs = arr id /> hasName "measure"
+              >>> listA (arrPrimitive divs)
 
-arrMeasure :: (ArrowXml a) => a XmlTree [Primitive]
-arrMeasure = arr id /> hasName "measure"
-         >>> listA arrPrimitive
+-- primitives are just notes and rests, will probably need to handle
+-- chords here as well
+arrPrimitive :: (ArrowXml a) => Int -> a XmlTree Primitive
+arrPrimitive divs = arr id /> hasName "note"
+                >>> ((arrNote divs) <+> (arrRest divs))
 
-arrPrimitive :: (ArrowXml a) => a XmlTree Primitive
-arrPrimitive = arr id /> hasName "note"
-           >>> (arrNote ||| arrRest)
+arrNote :: (ArrowXml a) => Int -> a XmlTree Primitive
+arrNote divs = arr id /> hasName "note"
+          >>> hasName ""
+          >>> (arrPitch &&& arrDuration divs)
+          >>^ (\((pc,oct),dur) -> Note pc oct Natural dur)
 
-arrRest :: (ArrowXml a) => a XmlTree Primitive
-arrRest = arr id /> hasName "note"
+
+arrRest :: (ArrowXml a) => Int -> a XmlTree Primitive
+arrRest divs = arr id /> hasName "note"
       >>> hasName "rest"
-      >>> arrDuration
+      >>> arrDuration divs
       >>^ Rest
 
 arrPitch :: (ArrowXml a) => a XmlTree (Pitchclass,Int)

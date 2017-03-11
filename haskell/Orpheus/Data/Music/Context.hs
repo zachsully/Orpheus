@@ -60,7 +60,7 @@ data Accidental
 data Duration = Duration Rational
   deriving (Show,Eq,Ord)
 
-type Octave = Int  
+type Octave = Int
 
 data Primitive
   = Note Pitchclass Octave Accidental Duration
