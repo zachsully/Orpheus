@@ -1,6 +1,5 @@
 module Orpheus.Data.Music.Context where
 
-
 --------------------------------------------------------------------------------
 --                                   Score                                    --
 --------------------------------------------------------------------------------
@@ -15,6 +14,8 @@ data Part context = Part (Voice context)
 
 -- In pieces without KeySig or TimeSig changes the outer list will just have
 -- a single element
+-- For list of list of primitives: given a context, return a sequence of [prim]
+-- [prim] could be a singleton, that being just a note, or a chord
 data Voice context = Voice [(context,[[Primitive]])]
   deriving (Show,Eq)
 
