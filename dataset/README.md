@@ -13,5 +13,5 @@ The data we have is:
 * Beethoven Piano Sonatas, 23 pieces (split into movements)
 
 [python-ly](https://github.com/wbsoft/python-ly)
-[]
+[bach-chorales](http://github.com/jshanley/bach-chorales.git)
 [MutopiaProject](http://github.com/MutopiaProject/MutopiaProject.git)
