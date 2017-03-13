@@ -5,7 +5,7 @@ import Orpheus.Data.Music.Context
 import Text.XML.HXT.Core
 
 --------------------------------------------------------------------------------
---                                Top Level                                   --
+--                                  Top Level                                 --
 --------------------------------------------------------------------------------
 -- for now we will only be concerned with this simple musical context
 type Ctx = (KeySig,TimeSig)
@@ -24,19 +24,20 @@ parseMusicXMLFile fp = do
 
 
 --------------------------------------------------------------------------------
--- Score Partwise captures the whole score
+--                               Score Partwise                               --
+--------------------------------------------------------------------------------
 arrScorePartwise :: (ArrowXml a) => a XmlTree (Score Ctx)
 arrScorePartwise
   =   hasName "score-partwise"
-  >>> listA  (constA (Part (Voice []))) -- listA arrPart
+  />  arrParts
   >>^ Score
 
 -- A part is probably a single instrument
-arrPart :: (ArrowXml a) => a XmlTree (Part Ctx)
-arrPart
+arrParts :: (ArrowXml a) => a XmlTree [Part Ctx]
+arrParts
   =   hasName "part"
   />  arrVoice
-  >>^ Part
+  >>> listA (arr Part)
 
 -- A voice will be a single instrument and can contain chords
 -- we will need to coalesce measures in the same context, eventually
@@ -50,8 +51,8 @@ arrMeasure :: (ArrowXml a) => a XmlTree (Ctx,[[Primitive]])
 arrMeasure
   =   hasName "measure"
   />  arrContext
-  >>^ (\(ctx,divs) -> (ctx,[[Rest (Duration 1)]]))
-  -- >>> (\c -> (c, fromSLA (snd c) (listA arrParPrimitive)))
+  >>^ (\c -> ((fst c), []))
+  -- >>^ (\c -> (fst c, fromSLA (snd c) (listA arrParPrimitive)))
 
 
 -- A context here, represents the KeySignature,TimeSignature
@@ -117,10 +118,12 @@ arrDuration
   =   hasName "duration"
   />  getText
   >>^ (\s -> case (read s :: Rational) of
-               x -> Duration x
-               _ -> error $ "Unrecognized duration: " ++ s)
+               x -> Duration x)
+               -- _ -> error $ "Unrecognized duration: " ++ s)
 
-------------------------
+-------------
+-- Pitches --
+-------------
 
 arrPitch :: (ArrowXml a) => a XmlTree (Pitchclass,Int)
 arrPitch

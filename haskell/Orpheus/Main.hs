@@ -24,18 +24,11 @@ import Language.Hakaru.Syntax.AST
 import Language.Hakaru.Pretty.Concrete
 import Language.Hakaru.Pretty.Haskell as HK
 
-import Orpheus.Data.Music.Diatonic
-import Orpheus.Data.Music.Nursery
-import Orpheus.Model.Diatonic
-import Orpheus.Model.Length
-import Data.Lilypond.Pretty
 import Data.MusicXML.Parser
 
 import qualified Text.PrettyPrint   as PP
 import qualified System.Random.MWC  as MWC
-import Control.Monad
 import System.Environment
-import Data.Vector
 -- import Data.Text (pack)
 
 main :: IO ()
