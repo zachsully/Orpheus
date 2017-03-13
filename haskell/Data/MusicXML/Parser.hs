@@ -20,7 +20,7 @@ parseMusicXMLFile fp = do
   case score of
     []     -> error "Failed to parse score"
     (s:[]) -> return s
-    _ -> error $ show $ score
+    _ -> error $ "Found multiple scores: " ++ (show score)
 
 
 --------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ parseMusicXMLFile fp = do
 arrScorePartwise :: (ArrowXml a) => a XmlTree (Score Ctx)
 arrScorePartwise
   =   hasName "score-partwise"
-  />  listA arrPart
+  >>> listA  (constA (Part (Voice []))) -- listA arrPart
   >>^ Score
 
 -- A part is probably a single instrument
@@ -50,7 +50,8 @@ arrMeasure :: (ArrowXml a) => a XmlTree (Ctx,[[Primitive]])
 arrMeasure
   =   hasName "measure"
   />  arrContext
-  >>> (fromSLA 0 (listA arrParPrimitive))
+  >>^ (\(ctx,divs) -> (ctx,[[Rest (Duration 1)]]))
+  -- >>> (\c -> (c, fromSLA (snd c) (listA arrParPrimitive)))
 
 
 -- A context here, represents the KeySignature,TimeSignature
@@ -71,7 +72,7 @@ arrKey
   =   hasName "key"
   />  ((hasName "fifths" /> getText) &&&
        (hasName "mode" /> getText))
-  >>^ (\(_,_) -> undefined)
+  >>^ (\(_,_) -> Major C)
 
 arrTime :: (ArrowXml a) => a XmlTree TimeSig
 arrTime
@@ -86,32 +87,33 @@ arrTime
 -- A chord in MusicXml is a series of notes that where the 2nd,...,nth
 -- note also contains the element <chord/>
 arrParPrimitive :: SLA Int XmlTree [Primitive]
-arrParPrimitive divs = undefined
+arrParPrimitive = constA []
 
 -- primitives are just notes and rests, will probably need to handle
 -- chords here as well
 arrPrimitive :: SLA Int XmlTree Primitive
-arrPrimitive divs
-  =  hasName "note"
-  /> ((arrNote divs) <+> (arrRest divs))
+arrPrimitive
+  =   hasName "note"
+  >>> constA (Rest (Duration 1))
+  -- /> (arrNote <+> arrRest)
 
 arrNote :: SLA Int XmlTree Primitive
-arrNote divs
+arrNote
   =   hasName "note"
-  />  (arrPitch &&& arrDuration divs)
+  />  (arrPitch &&& arrDuration)
   >>^ (\((pc,oct),dur) -> Note pc oct Natural dur)
 
 
 arrRest :: SLA Int XmlTree Primitive
-arrRest divs
+arrRest
   =   hasName "note"
   />  hasName "rest"
-  >>> arrDuration divs
+  >>> arrDuration
   >>^ Rest
 
 -- divisions per quarter note
 arrDuration :: SLA Int XmlTree Duration
-arrDuration divisions
+arrDuration
   =   hasName "duration"
   />  getText
   >>^ (\s -> case (read s :: Rational) of
