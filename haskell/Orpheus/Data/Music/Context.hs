@@ -29,9 +29,11 @@ data Voice context = Voice [(context,[[Primitive]])]
 data Tempo = Tempo Int
   deriving (Show,Eq,Ord)
 
+-- the int represents the number of fifths away from C and therefore the number
+-- of sharps or flats in the key signature
 data KeySig
-  = Major Pitchclass
-  | Minor Pitchclass
+  = Major Int
+  | Minor Int
   deriving (Show,Eq)
 
 data TimeSig = TimeSig Int Int
