@@ -9,7 +9,7 @@ and were converted by use of the tool `python-ly`.
 
 The data we have is:
 * Horetsky "60 National Airs of Different Nations", 60 pieces
-* Bach Chorales Harmonizations, 404 pieces
+* Bach Chorales Harmonizations 250-438, 404 pieces
 * Beethoven Piano Sonatas, 23 pieces (split into movements)
 
 [python-ly](https://github.com/wbsoft/python-ly)
