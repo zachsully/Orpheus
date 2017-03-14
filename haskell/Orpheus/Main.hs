@@ -26,6 +26,7 @@ import Language.Hakaru.Pretty.Haskell as HK
 
 import Data.MusicXML.Parser
 import Orpheus.Data.Music.Context
+import Orpheus.DataSet
 
 import qualified Text.PrettyPrint   as PP
 import qualified System.Random.MWC  as MWC
@@ -36,6 +37,7 @@ main :: IO ()
 main = do
   (fp:[]) <- getArgs
   xmlParseTest fp
+  datasetSummary
 
 xmlParseTest :: FilePath -> IO ()
 xmlParseTest fp = do

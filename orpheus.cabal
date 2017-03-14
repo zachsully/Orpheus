@@ -25,6 +25,7 @@ library
                        Orpheus.Data.Music.Chord,
                        Orpheus.Data.Music.Nursery,
                        Orpheus.Data.Music.Context,
+                       Orpheus.DataSet,
                        Data.Lilypond.Pretty,
                        Data.Lilypond.Parser
                        Data.MusicXML.Pretty,
@@ -40,6 +41,7 @@ library
                        mwc-random >= 0.13 && < 0.14,
                        array      >= 0.5,
                        mtl        >= 2.2,
+                       csv        >= 0.1,
                        hxt        >= 9.3
 
   hs-source-dirs:      haskell
