@@ -1,4 +1,5 @@
 {-# LANGUAGE Arrows #-}
+{-# LANGUAGE BangPatterns #-}
 module Data.MusicXML.Parser where
 
 import Orpheus.Data.Music.Context
@@ -28,32 +29,34 @@ parseMusicXMLFile fp = do
 --------------------------------------------------------------------------------
 arrScorePartwise :: (ArrowXml a) => a XmlTree (Score Ctx)
 arrScorePartwise
-  =   listA (hasName "score-partwise" /> arrPart)
+  =   listA (hasName "score-partwise" /> returnA)
+  >>> listA arrParts
   >>^ Score
 
 -- A part is probably a single instrument
-arrPart :: (ArrowXml a) => a XmlTree (Part Ctx)
-arrPart
-  =   hasName "part"
-  />  arrVoice
-  >>^ Part
+arrParts :: (ArrowXml a) => a [XmlTree] (Part Ctx)
+arrParts = unlistA
+       >>> listA (hasName "part" /> returnA)
+       >>> arrVoice
+       >>^ Part
 
 -- A voice will be a single instrument and can contain chords
 -- we will need to coalesce measures in the same context, eventually
-arrVoice :: (ArrowXml a) => a XmlTree (Voice Ctx)
+arrVoice :: (ArrowXml a) => a [XmlTree] (Voice Ctx)
 arrVoice
-  =   listA (fromSLA (error "no state set" :: Rational) arrMeasure)
+  =   unlistA
+  >>> listA (fromSLA (error "no state set" :: (Ctx,Rational)) arrMeasure)
   >>^ Voice
 
 -- > measures are sequences of notes,
 -- > they can also contain attributes including contexts for the next sequence
 --   of notes
-arrMeasure :: SLA Rational XmlTree (Ctx,[[Primitive]])
+arrMeasure :: SLA (Ctx,Rational) XmlTree (Ctx,[[Primitive]])
 arrMeasure
-  =   hasName "measure"
-  />  (arrContext >>^ (error . show))
-  >>> (changeState $ \_ (_,divs) -> divs)
-  >>^ (\(ctx,_) -> (ctx,[]))
+  =   (hasName "measure" /> (perform (arrContext >>> setState)))
+  >>> ((getState >>^ (\(!x) -> x)))
+  -- >>^ (\((!x,!y),!z) -> )
+  >>^ (\((!x,!y),!z) -> ((x,y),[]))
 
 -- A context here, represents the KeySignature,TimeSignature
 -- we also attach a divisions integer that will be used for deciding note length
@@ -61,6 +64,7 @@ arrContext :: (ArrowXml a) => a XmlTree (Ctx,Rational)
 arrContext
   =   (listA (hasName "attributes" />  returnA))
   >>> ((arrKey &&& arrTime) &&& arrDivisions)
+  >>^ (\(!x) -> x)
 
 arrDivisions :: (ArrowXml a) => a [XmlTree] Rational
 arrDivisions
@@ -69,6 +73,7 @@ arrDivisions
   />  getText
   >>^ (read :: String -> Int)
   >>^ fromIntegral
+  >>^ (\(!x) -> x)
 
 arrKey :: (ArrowXml a) => a [XmlTree] KeySig
 arrKey
@@ -80,7 +85,7 @@ arrKey
                    "minor" -> Minor
                    "major" -> Major
                    _ -> error $ "Unrecognized mode: " ++ mode
-         in m . read $ fs)
+         in m . read $! fs)
   where arrFifths = unlistA >>> hasName "fifths" /> getText
         arrMode   = unlistA >>> hasName "mode" /> getText
 
@@ -89,7 +94,7 @@ arrTime
   =   unlistA
   >>> (hasName "time" >>> listA getChildren)
   >>> (arrBeats &&& arrBeatType)
-  >>^ (\(b,bt) -> TimeSig b bt)
+  >>^ (\(!b,!bt) -> TimeSig b bt)
   where arrBeats = unlistA >>> hasName "beats" /> getText >>^ read
         arrBeatType = unlistA >>> hasName "beat-type" /> getText >>^ read
 
