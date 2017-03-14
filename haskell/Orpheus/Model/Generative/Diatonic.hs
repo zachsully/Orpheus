@@ -1,5 +1,5 @@
-{-# LANGUAGE DataKinds,
-             FlexibleContexts #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
 --------------------------------------------------------------------------------
 --                                                                  2017.01.13
 -- |
@@ -14,7 +14,7 @@
 --
 --------------------------------------------------------------------------------
 
-module Orpheus.Model.Diatonic where
+module Orpheus.Model.Generative.Diatonic where
 
 import Orpheus.Data.Music.Diatonic
 

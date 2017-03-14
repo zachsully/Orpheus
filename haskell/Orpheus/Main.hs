@@ -25,6 +25,7 @@ import Language.Hakaru.Pretty.Concrete
 import Language.Hakaru.Pretty.Haskell as HK
 
 import Data.MusicXML.Parser
+import Orpheus.Data.Music.Context
 
 import qualified Text.PrettyPrint   as PP
 import qualified System.Random.MWC  as MWC
@@ -35,22 +36,25 @@ main :: IO ()
 main = do
   (fp:[]) <- getArgs
   xmlParseTest fp
-  -- prettyProg $ triv $ mLength (prob_ 0.3) (prob_ 0.5) mPrimitive
-  -- let -- m  = runEvaluate $ triv $ mDuration
-  --     m2 = runEvaluate $ triv $ categorical (array (nat_ 2) (\_ -> prob_ 0.5))
-  --     m3 = runEvaluate $ triv $ geometric (prob_ 0.5)
-  -- gen <- MWC.createSystemRandom
-  -- forever $ illustrate (SMeasure SNat) gen m3
--- main = do
---   (x:_) <- getArgs
---   let index = (read x) :: Int
---   putStrLn . prettyPrintScore . Score . singleton $
---     Prelude.head . Prelude.drop index $ rhymes
 
 xmlParseTest :: FilePath -> IO ()
-xmlParseTest fp =  putStrLn =<< show <$> parseMusicXMLFile fp
+xmlParseTest fp = do
+  score <- parseMusicXMLFile fp
+  print score
+  case score of
+    Score parts -> do
+      putStrLn $ "Number of parts: " ++ (show . length $ parts)
+      case head parts of
+        Part (Voice xs) -> putStrLn $ "Number of measures: " ++ (show . length $ xs)
+
+--------------------------------------------------------------------------------
+--                        Learning Discriminitive Models                      --
+--------------------------------------------------------------------------------
 
 
+--------------------------------------------------------------------------------
+--                        Sampling From Generative Model                      --
+--------------------------------------------------------------------------------
 {-
   mDuration is defined recursively and never returns a sample. Should this just
   be modelled with a geometric distribution instead?

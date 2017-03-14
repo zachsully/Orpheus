@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds,
              FlexibleContexts #-}
 
-module Orpheus.Model.Length where
+module Orpheus.Model.Generative.Length where
 
 import Orpheus.Data.Music.Diatonic
 

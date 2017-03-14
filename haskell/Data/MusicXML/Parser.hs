@@ -1,5 +1,3 @@
-{-# LANGUAGE Arrows #-}
-{-# LANGUAGE BangPatterns #-}
 module Data.MusicXML.Parser where
 
 import Orpheus.Data.Music.Context
@@ -45,7 +43,8 @@ arrParts = unlistA
 arrVoice :: (ArrowXml a) => a [XmlTree] (Voice Ctx)
 arrVoice
   =   unlistA
-  >>> listA (fromSLA (error "no state set" :: (Ctx,Rational)) arrMeasure)
+  -- >>> listA (fromSLA (error "no state set" :: (Ctx,Rational)) arrMeasure)
+  >>> fromSLA (((Major 0, TimeSig 4 4),1) :: (Ctx,Rational)) (listA arrMeasure)
   >>^ Voice
 
 -- > measures are sequences of notes,
@@ -53,10 +52,8 @@ arrVoice
 --   of notes
 arrMeasure :: SLA (Ctx,Rational) XmlTree (Ctx,[[Primitive]])
 arrMeasure
-  =   (hasName "measure" /> (perform (arrContext >>> setState)))
-  >>> ((getState >>^ (\(!x) -> x)))
-  -- >>^ (\((!x,!y),!z) -> )
-  >>^ (\((!x,!y),!z) -> ((x,y),[]))
+  =   (hasName "measure" /> perform (arrContext >>> setState))
+  >>> arrParPrimitive
 
 -- A context here, represents the KeySignature,TimeSignature
 -- we also attach a divisions integer that will be used for deciding note length
@@ -64,7 +61,7 @@ arrContext :: (ArrowXml a) => a XmlTree (Ctx,Rational)
 arrContext
   =   (listA (hasName "attributes" />  returnA))
   >>> ((arrKey &&& arrTime) &&& arrDivisions)
-  >>^ (\(!x) -> x)
+
 
 arrDivisions :: (ArrowXml a) => a [XmlTree] Rational
 arrDivisions
@@ -73,7 +70,6 @@ arrDivisions
   />  getText
   >>^ (read :: String -> Int)
   >>^ fromIntegral
-  >>^ (\(!x) -> x)
 
 arrKey :: (ArrowXml a) => a [XmlTree] KeySig
 arrKey
@@ -94,7 +90,7 @@ arrTime
   =   unlistA
   >>> (hasName "time" >>> listA getChildren)
   >>> (arrBeats &&& arrBeatType)
-  >>^ (\(!b,!bt) -> TimeSig b bt)
+  >>^ (\(b,bt) -> TimeSig b bt)
   where arrBeats = unlistA >>> hasName "beats" /> getText >>^ read
         arrBeatType = unlistA >>> hasName "beat-type" /> getText >>^ read
 
@@ -104,25 +100,25 @@ arrTime
 
 -- A chord in MusicXml is a series of notes that where the 2nd,...,nth
 -- note also contains the element <chord/>
-arrParPrimitive :: SLA Rational XmlTree [Primitive]
-arrParPrimitive = listA arrPrimitive
+arrParPrimitive :: SLA (Ctx,Rational) XmlTree (Ctx,[[Primitive]])
+arrParPrimitive = (getState >>^ fst) &&& listA (listA arrPrimitive)
 
 -- primitives are just notes and rests, will probably need to handle
 -- chords here as well
-arrPrimitive :: SLA Rational XmlTree Primitive
+arrPrimitive :: SLA (Ctx,Rational) XmlTree Primitive
 arrPrimitive
   =   hasName "note"
-  >>> constA (Rest (Duration 1))
-  -- /> (arrNote <+> arrRest)
+  -- >>> constA (Rest (Duration 1))
+  /> (arrNote <+> arrRest)
 
-arrNote :: SLA Rational XmlTree Primitive
+arrNote :: SLA (Ctx,Rational) XmlTree Primitive
 arrNote
   =   hasName "note"
   />  (arrPitch &&& arrDuration)
   >>^ (\((pc,oct),dur) -> Note pc oct Natural dur)
 
 
-arrRest :: SLA Rational XmlTree Primitive
+arrRest :: SLA (Ctx,Rational) XmlTree Primitive
 arrRest
   =   hasName "note"
   />  hasName "rest"
@@ -130,11 +126,11 @@ arrRest
   >>^ Rest
 
 -- divisions per quarter note
-arrDuration :: SLA Rational XmlTree Duration
+arrDuration :: SLA (Ctx,Rational) XmlTree Duration
 arrDuration
   =   hasName "duration"
   />  getText
-  >>> (accessState $ \divs t ->
+  >>> (accessState $ \(_,divs) t ->
          case (read t :: Rational) of
             x -> Duration (4 * x / divs))
 
