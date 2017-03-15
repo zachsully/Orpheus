@@ -25,14 +25,14 @@ parseMusicXMLFile fp = do
     _ -> error $ "Found multiple scores: " ++ (show score)
 
 prettyXMLFile :: FilePath -> FilePath -> IO ()
-prettyXMLFile fin fout = do
-  runX $ readDocument [ withValidate         False
-                      , withSubstDTDEntities False
-                      , withRemoveWS         True
-                      ] fin
+prettyXMLFile fin fout =
+  (runX $ readDocument [ withValidate         False
+                       , withSubstDTDEntities False
+                       , withRemoveWS         True
+                       ] fin
      >>> indentDoc
-     >>> putXmlDocument True fout
-  return ()
+     >>> putXmlDocument True fout)
+  >> return ()
 
 
 errorA :: (ArrowXml a, Show b) => a b c
@@ -120,35 +120,31 @@ arrTime
 -- A chord in MusicXml is a series of notes that where the 2nd,...,nth
 -- note also contains the element <chord/>
 arrParPrimitive :: SLA (Ctx,Rational) XmlTree (Ctx,[[Primitive]])
-arrParPrimitive = (getState >>^ fst) &&& listA (listA arrPrimitive)
+arrParPrimitive = (getState >>^ fst) &&& listA arrSeqPrimitive
 
 -- primitives are just notes and rests, will probably need to handle
 -- chords here as well
-arrPrimitive :: SLA (Ctx,Rational) XmlTree Primitive
-arrPrimitive
+arrSeqPrimitive :: SLA (Ctx,Rational) XmlTree [Primitive]
+arrSeqPrimitive
   =   hasName "note"
-  -- >>> constA (Rest (Duration 1))
-  /> (arrNote <+> arrRest)
+  />  listA (arrNote <+> arrRest)
 
 arrNote :: SLA (Ctx,Rational) XmlTree Primitive
 arrNote
-  =   hasName "note"
-  />  (arrPitch &&& arrDuration)
+  =   (arrPitch &&& arrDuration)
   >>^ (\((pc,oct),dur) -> Note pc oct Natural dur)
 
 
 arrRest :: SLA (Ctx,Rational) XmlTree Primitive
 arrRest
-  =   hasName "note"
-  />  hasName "rest"
-  >>> arrDuration
+  =   hasName "rest"
+  />  arrDuration
   >>^ Rest
 
 -- divisions per quarter note
 arrDuration :: SLA (Ctx,Rational) XmlTree Duration
 arrDuration
-  =   hasName "duration"
-  />  getText
+  =   (hasName "duration" />  getText)
   >>> (accessState $ \(_,divs) t ->
          case (read t :: Rational) of
             x -> Duration (4 * x / divs))
