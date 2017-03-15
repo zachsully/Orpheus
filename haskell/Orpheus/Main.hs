@@ -36,11 +36,12 @@ import Control.Monad
 
 main :: IO ()
 main = do
-  (fp:[]) <- getArgs
+  (fin:fout:[]) <- getArgs
+  tryFixXMLFile fin fout
   -- xmlParseTest fp
-  ds <- getDataSet
-  datasetSummary ds
-  classifierSummary ds
+  -- ds <- getDataSet
+  -- datasetSummary ds
+  -- classifierSummary ds
 
 xmlParseTest :: FilePath -> IO ()
 xmlParseTest fp = do
@@ -69,8 +70,8 @@ classifiers = [("Majority Class",majorityClass)]
 -- takes in a labelled dataset, runs the classifiers on it, and returns the
 -- classifiers correct and incorrect
 runClassifiers :: [(Score Ctx, Composer)] -> IO [(String,Int,Int)]
-runClassifiers dataset
-  = forM classifiers $ \(name,fun) -> do
+runClassifiers _
+  = forM classifiers $ \(name,_) -> do
       putStrLn $ "Running " ++ name ++ "..."
       return (name,0,0)
 
@@ -80,7 +81,7 @@ classifierSummary dataset = do
   forM_ results $ \(name,right,wrong) ->
     putStrLn $
       unwords [name,": (",show right,",",show wrong,") : "
-              , show ((fromIntegral right) / (fromIntegral (right + wrong)))
+              , show (((fromIntegral right) / (fromIntegral (right + wrong))) :: Double)
               ]
 
 
