@@ -26,18 +26,21 @@ import Language.Hakaru.Pretty.Haskell as HK
 
 import Data.MusicXML.Parser
 import Orpheus.Data.Music.Context
+import Orpheus.Model.Discriminative.MajorityClass
 import Orpheus.DataSet
 
 import qualified Text.PrettyPrint   as PP
 import qualified System.Random.MWC  as MWC
 import System.Environment
--- import Data.Text (pack)
+import Control.Monad
 
 main :: IO ()
 main = do
   (fp:[]) <- getArgs
-  xmlParseTest fp
-  datasetSummary
+  -- xmlParseTest fp
+  ds <- getDataSet
+  datasetSummary ds
+  classifierSummary ds
 
 xmlParseTest :: FilePath -> IO ()
 xmlParseTest fp = do
@@ -52,6 +55,33 @@ xmlParseTest fp = do
 --------------------------------------------------------------------------------
 --                        Learning Discriminitive Models                      --
 --------------------------------------------------------------------------------
+{- Discriminitive Learning Goals
+> categorize piece
+> categorize measure
+-}
+type Classifier x y = [(x,y)] -> (x -> y)
+type Ctx = (KeySig,TimeSig)
+
+-- the string here is just a nice label for errors and printing
+classifiers :: [(String,Classifier [Score Ctx] Composer)]
+classifiers = [("Majority Class",majorityClass)]
+
+-- takes in a labelled dataset, runs the classifiers on it, and returns the
+-- classifiers correct and incorrect
+runClassifiers :: [(Score Ctx, Composer)] -> IO [(String,Int,Int)]
+runClassifiers dataset
+  = forM classifiers $ \(name,fun) -> do
+      putStrLn $ "Running " ++ name ++ "..."
+      return (name,0,0)
+
+classifierSummary :: [(Score Ctx, Composer)] -> IO ()
+classifierSummary dataset = do
+  results <- runClassifiers dataset
+  forM_ results $ \(name,right,wrong) ->
+    putStrLn $
+      unwords [name,": (",show right,",",show wrong,") : "
+              , show ((fromIntegral right) / (fromIntegral (right + wrong)))
+              ]
 
 
 --------------------------------------------------------------------------------

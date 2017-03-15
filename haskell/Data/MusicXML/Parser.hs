@@ -1,4 +1,4 @@
-module Data.MusicXML.Parser where
+module Data.MusicXML.Parser (parseMusicXMLFile) where
 
 import Orpheus.Data.Music.Context
 import Text.XML.HXT.Core
