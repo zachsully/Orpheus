@@ -36,9 +36,9 @@ import Control.Monad
 
 main :: IO ()
 main = do
-  (fin:fout:[]) <- getArgs
-  tryFixXMLFile fin fout
-  -- xmlParseTest fp
+  (fin:[]) <- getArgs
+  -- prettyXMLFile fin fout
+  xmlParseTest fin
   -- ds <- getDataSet
   -- datasetSummary ds
   -- classifierSummary ds

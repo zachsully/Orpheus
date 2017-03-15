@@ -1,4 +1,7 @@
-module Data.MusicXML.Parser (parseMusicXMLFile,tryFixXMLFile) where
+module Data.MusicXML.Parser
+  ( parseMusicXMLFile
+  , prettyXMLFile
+  ) where
 
 import Orpheus.Data.Music.Context
 import Text.XML.HXT.Core
@@ -21,12 +24,13 @@ parseMusicXMLFile fp = do
     (s:[]) -> return s
     _ -> error $ "Found multiple scores: " ++ (show score)
 
-tryFixXMLFile :: FilePath -> FilePath -> IO ()
-tryFixXMLFile fin fout = do
+prettyXMLFile :: FilePath -> FilePath -> IO ()
+prettyXMLFile fin fout = do
   runX $ readDocument [ withValidate         False
                       , withSubstDTDEntities False
                       , withRemoveWS         True
                       ] fin
+     >>> indentDoc
      >>> putXmlDocument True fout
   return ()
 
