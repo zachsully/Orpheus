@@ -6,6 +6,40 @@ module Data.MusicXML.Parser
 import Orpheus.Data.Music.Context
 import Text.XML.HXT.Core
 
+{- Currently Failing to Parse:
+025000B_.xml
+025100B_.xml
+025200B_.xml
+026700B_.xml
+027700B_.xml
+028100B_.xml
+028200B_.xml
+028400B_.xml
+030300B_.xml
+030700B_.xml
+030800B_.xml
+031000B_.xml
+031800B_.xml
+032300B_.xml
+032400B_.xml
+032500B_.xml
+032800B_.xml
+033200B_.xml
+033300B_.xml
+033500B_.xml
+035000B_.xml
+035100B_.xml
+035200B_.xml
+035600B_.xml
+036100B_.xml
+036200B_.xml
+036500B_.xml
+036700B_.xml
+036800B_.xml
+037000B_.xml
+...
+-}
+
 --------------------------------------------------------------------------------
 --                                  Top Level                                 --
 --------------------------------------------------------------------------------
@@ -116,7 +150,11 @@ arrTime
 --------------------------------------------------------------------------------
 --                                  Primitives                                --
 --------------------------------------------------------------------------------
-
+{-
+Primitives are inside "note" tags and there are several things that need to be
+parsed at once: pitch or rest, duration, and maybe chord tags. Therefore, we
+pass the primitive information as a list to each arrow
+-}
 -- A chord in MusicXml is a series of notes that where the 2nd,...,nth
 -- note also contains the element <chord/>
 arrParPrimitive :: SLA (Ctx,Rational) XmlTree (Ctx,[[Primitive]])
@@ -126,41 +164,46 @@ arrParPrimitive = (getState >>^ fst) &&& listA arrSeqPrimitive
 -- chords here as well
 arrSeqPrimitive :: SLA (Ctx,Rational) XmlTree [Primitive]
 arrSeqPrimitive
-  =   hasName "note"
-  />  listA (arrNote <+> arrRest)
+  =   listA (hasName "note" >>> getChildren) -- pass all "note" information to subarrows
+  >>> listA (arrNote <+> arrRest)
 
-arrNote :: SLA (Ctx,Rational) XmlTree Primitive
+arrNote :: SLA (Ctx,Rational) [XmlTree] Primitive
 arrNote
   =   (arrPitch &&& arrDuration)
   >>^ (\((pc,oct),dur) -> Note pc oct Natural dur)
 
 
-arrRest :: SLA (Ctx,Rational) XmlTree Primitive
-arrRest
-  =   hasName "rest"
-  />  arrDuration
-  >>^ Rest
+-- ^ will return a rest if there is a rest tage in the note data
+arrRest :: SLA (Ctx,Rational) [XmlTree] Primitive
+arrRest = arrDuration >>^ Rest
 
 -- divisions per quarter note
-arrDuration :: SLA (Ctx,Rational) XmlTree Duration
+-- ^ Takes a list of "note" trees and returns a duration
+arrDuration :: SLA (Ctx,Rational) [XmlTree] Duration
 arrDuration
-  =   (hasName "duration" />  getText)
+  =   unlistA
+  >>> (hasName "duration" /> getText)
   >>> (accessState $ \(_,divs) t ->
-         case (read t :: Rational) of
-            x -> Duration (4 * x / divs))
+         case (read t :: Int) of
+            int -> Duration (4 * (toRational int) / divs))
 
 -------------
 -- Pitches --
 -------------
 
-arrPitch :: (ArrowXml a) => a XmlTree (Pitchclass,Int)
+-- ^ Takes a list of "note" trees and returns a pitch and octave
+arrPitch :: (ArrowXml a) => a [XmlTree] (Pitchclass,Int)
 arrPitch
-  =   hasName "pitch"
+  =   unlistA
+  >>> listA (hasName "pitch" >>> getChildren)
   >>> (arrPitchclass &&& arrOctave)
 
-arrPitchclass :: (ArrowXml a) => a XmlTree Pitchclass
+-- ^ Takes a list of "pitch" trees and returns the pitchclass
+arrPitchclass :: (ArrowXml a) => a [XmlTree] Pitchclass
 arrPitchclass
-  =   hasName "step" /> getText
+  =   unlistA
+  >>> hasName "step"
+  />  getText
   >>^ (\s -> case s of
                "A" -> A
                "B" -> B
@@ -171,8 +214,6 @@ arrPitchclass
                "G" -> G
                _   -> error $ "Unrecognized pitchclass: " ++ s)
 
-arrOctave :: (ArrowXml a) => a XmlTree Int
-arrOctave
-  =   hasName "octave"
-  />  getText
-  >>^ read
+-- ^ Takes a list of "pitch" trees and returns the octave
+arrOctave :: (ArrowXml a) => a [XmlTree] Int
+arrOctave = unlistA >>> hasName "octave" /> getText >>^ read

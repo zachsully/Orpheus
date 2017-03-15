@@ -24,6 +24,7 @@ import Language.Hakaru.Syntax.AST
 import Language.Hakaru.Pretty.Concrete
 import Language.Hakaru.Pretty.Haskell as HK
 
+import Data.Monoid
 import Data.MusicXML.Parser
 import Orpheus.Data.Music.Context
 import Orpheus.Model.Discriminative.MajorityClass
@@ -31,27 +32,54 @@ import Orpheus.DataSet
 
 import qualified Text.PrettyPrint   as PP
 import qualified System.Random.MWC  as MWC
-import System.Environment
 import Control.Monad
+import Options.Applicative
+
+
+--------------------------------------------------------------------------------
+--                             Executable Options                             --
+--------------------------------------------------------------------------------
+data Mode
+  = Test FilePath
+  | Run
+  deriving (Show,Eq)
+
+data Options = Options { mode :: Mode }
+  deriving (Show,Eq)
+
+parseTest :: Parser Mode
+parseTest = Test <$> strArgument (metavar "FILE" <> help "xml file to test")
+
+parseRun :: Parser Mode
+parseRun = pure Run
+
+options :: Parser Options
+options = Options <$> (parseTest <|> parseRun)
+
+parseOpts :: IO Options
+parseOpts = execParser
+          $ info (helper <*> options)
+          $ fullDesc <> progDesc "Orpheus, a musician, a poet"
+
+
+--------------------------------------------------------------------------------
 
 main :: IO ()
 main = do
-  (fin:[]) <- getArgs
-  -- prettyXMLFile fin fout
-  xmlParseTest fin
-  -- ds <- getDataSet
-  -- datasetSummary ds
-  -- classifierSummary ds
+  opts <- parseOpts
+  case mode opts of
+    Test fin -> do putStrLn $ "Testing: " ++ fin ++ "..."
+                   xmlParseTest fin
+    Run -> do putStrLn "Running classifiers..."
+              ds <- getDataSet
+              datasetSummary ds
+              classifierSummary ds
 
 xmlParseTest :: FilePath -> IO ()
 xmlParseTest fp = do
   score <- parseMusicXMLFile fp
   print score
-  case score of
-    Score parts -> do
-      putStrLn $ "Number of parts: " ++ (show . length $ parts)
-      case head parts of
-        Part (Voice xs) -> putStrLn $ "Number of measures: " ++ (show . length $ xs)
+  scoreSummary score
 
 --------------------------------------------------------------------------------
 --                        Learning Discriminitive Models                      --
