@@ -105,14 +105,15 @@ arrVoice
 -- ^ Takes children of a measure node and a state
 arrMeasure :: SLA (Ctx,Rational) XmlTree (Ctx,[[Primitive]])
 arrMeasure
-  =   perform (arrContext >>> setState)
+  =   (perform ((listA returnA) >>> arrContext >>> setState))
   >>> arrParPrimitive
 
 -- A context here, represents the KeySignature,TimeSignature
 -- we also attach a divisions integer that will be used for deciding note length
-arrContext :: (ArrowXml a) => a XmlTree (Ctx,Rational)
+arrContext :: (ArrowXml a) => a [XmlTree] (Ctx,Rational)
 arrContext
-  =   (listA (hasName "attributes" />  returnA))
+  =   unlistA
+  >>> (listA (hasName "attributes" />  returnA))
   >>> ((arrKey &&& arrTime) &&& arrDivisions)
 
 
@@ -158,7 +159,7 @@ pass the primitive information as a list to each arrow
 -- A chord in MusicXml is a series of notes that where the 2nd,...,nth
 -- note also contains the element <chord/>
 arrParPrimitive :: SLA (Ctx,Rational) XmlTree (Ctx,[[Primitive]])
-arrParPrimitive = (getState >>^ fst) &&& listA arrSeqPrimitive
+arrParPrimitive = (getState >>^ fst) &&& (hasName "note" >>> listA arrSeqPrimitive)
 
 -- primitives are just notes and rests, will probably need to handle
 -- chords here as well
@@ -173,9 +174,12 @@ arrNote
   >>^ (\((pc,oct),dur) -> Note pc oct Natural dur)
 
 
--- ^ will return a rest if there is a rest tage in the note data
+-- ^ will return a rest if there is a rest tage in the note data, this fails if
+--   the "rest" tag is not present
 arrRest :: SLA (Ctx,Rational) [XmlTree] Primitive
-arrRest = arrDuration >>^ Rest
+arrRest
+  =   (filterA (unlistA >>> hasName "rest"))
+  >>> (arrDuration >>^ Rest)
 
 -- divisions per quarter note
 -- ^ Takes a list of "note" trees and returns a duration
