@@ -36,8 +36,7 @@
     <word-font font-family="Times" font-size="7"/>
   </defaults>
   <credit>
-    <credit-words default-x="757" default-y="1770" font-family="Garamond 3 SC" font-size="9.8" justify="center" valign="top">BWV 197.7a &
-BWV 398</credit-words>
+    <credit-words default-x="757" default-y="1770" font-family="Garamond 3 SC" font-size="9.8" justify="center" valign="top">BWV 197.7a BWV 398</credit-words>
   </credit>
   <credit>
     <credit-words default-x="1120" default-y="1689" font-family="Helvetica" valign="top">PDF © 2004 Margaret Greentree

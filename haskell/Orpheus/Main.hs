@@ -68,9 +68,10 @@ main :: IO ()
 main = do
   opts <- parseOpts
   case mode opts of
-    Test fin -> do putStrLn $ "Testing: " ++ fin ++ "..."
+    Test fin -> do putStrLn $ "MODE: Test, " ++ fin ++ "..."
                    xmlParseTest fin
-    Run -> do putStrLn "Running classifiers..."
+    Run -> do putStrLn "MODE: Run..."
+              putStrLn "Parsing dataset..."
               ds <- getDataSet
               datasetSummary ds
               classifierSummary ds
@@ -84,10 +85,17 @@ xmlParseTest fp = do
 --------------------------------------------------------------------------------
 --                        Learning Discriminitive Models                      --
 --------------------------------------------------------------------------------
-{- Discriminitive Learning Goals
+{-
+Discriminitive Learning Goals:
 > categorize piece
 > categorize measure
+
+TODO:
+> data partitioning
+> feature selection
+> use or build SVM
 -}
+
 type Classifier x y = [(x,y)] -> (x -> y)
 type Ctx = (KeySig,TimeSig)
 

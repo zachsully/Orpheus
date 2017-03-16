@@ -45,6 +45,8 @@ library
                        csv                  >= 0.1,
                        filepath             >= 1.4,
                        unordered-containers >= 0.2,
+                       random-shuffle       >= 0.0,
+                       random               >= 1.1,
                        hxt                  >= 9.3
 
   hs-source-dirs:      haskell

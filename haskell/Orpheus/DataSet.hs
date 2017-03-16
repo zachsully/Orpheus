@@ -4,10 +4,13 @@ module Orpheus.DataSet where
 import GHC.Generics (Generic)
 import Control.Monad
 import Text.CSV
-import System.FilePath.Posix
 import Orpheus.Data.Music.Context
 import Data.Hashable
 import Data.MusicXML.Parser
+import System.FilePath.Posix
+import System.Random.Shuffle (shuffle')
+import System.Random (mkStdGen)
+
 
 --------------------------------------------------------------------------------
 --                                DataSet Types                               --
@@ -69,11 +72,32 @@ Ideally, I would like to have the ability to partition data randomly. I would
 like to have a 50/25/25 partition and a 70/30 partition
 -}
 
-trainValidTestPartition :: DataSet -> (DataSet,DataSet,DataSet)
-trainValidTestPartition = undefined
+measurePartition :: a
+measurePartition = undefined
 
-trainTestPartition :: DataSet -> (DataSet,DataSet)
-trainTestPartition = undefined
+rPermute :: Int -> [a] -> [a]
+rPermute len ds = shuffle' ds len (mkStdGen 0)
+
+trainValidTestPartition :: [a] -> ([a],[a],[a])
+trainValidTestPartition ds =
+   let len = length ds
+       ds' = rPermute len ds
+       half    = ceiling (fromIntegral len * (0.5 :: Double))
+       quarter = floor (fromIntegral len * (0.25 :: Double))
+   in ( take half ds'
+      , take quarter . drop half $ ds'
+      , drop (quarter + half) $ ds'
+      )
+
+trainTestPartition :: [a] -> ([a],[a])
+trainTestPartition ds =
+   let len = length ds
+       ds' = rPermute len ds
+       seventy = ceiling (fromIntegral len * (0.7 :: Double))
+   in ( take seventy ds'
+      , drop seventy $ ds'
+      )
+
 
 
 --------------------------------------------------------------------------------
@@ -92,13 +116,14 @@ scoreSummary score =
 
 datasetSummary :: DataSet -> IO ()
 datasetSummary ds = do
-  putStrLn "Dataset Summary:"
+  putStrLn "\nDataset Summary:"
   putStrLn $ summaryC Bach
   putStrLn $ summaryC Beethoven
   putStrLn $ summaryC Horetzky
   putStrLn "\n"
-  where summaryC c = concat [ show c
-                            , " pieces #"
+  where summaryC c = concat [ "  > "
+                            , show c
+                            , " pieces: #"
                             , show . length $ filter (\(_,c') -> c' == c) ds
                             ]
 
