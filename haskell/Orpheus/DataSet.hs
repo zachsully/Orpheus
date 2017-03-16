@@ -10,7 +10,7 @@ import Data.Hashable
 import Data.MusicXML.Parser
 
 --------------------------------------------------------------------------------
---                                   DataSet                                  --
+--                                DataSet Types                               --
 --------------------------------------------------------------------------------
 
 type DataSet = [(Score (KeySig,TimeSig), Composer)]
@@ -21,17 +21,9 @@ data Composer = Bach | Beethoven | Horetzky
 instance Hashable Composer
 
 --------------------------------------------------------------------------------
--- this is the path from the root orpheus project directory
-dsDir :: FilePath
-dsDir = "dataset"
-
-composerFile :: Composer -> FilePath
-composerFile Bach      = "bach.csv"
-composerFile Beethoven = "beethoven.csv"
-composerFile Horetzky  = "horetzky.csv"
-
-
+--                                   IO                                       --
 --------------------------------------------------------------------------------
+
 getCSVs :: IO [(CSV,Composer)]
 getCSVs
   = forM [Bach,Beethoven,Horetzky] $ \c -> do
@@ -51,11 +43,42 @@ getDataSet = do
     scr <- parseMusicXMLFile (dsDir </> "xml" </> f)
     return (scr,c)
 
+-----------
+-- Paths --
+-----------
+
+dsDir :: FilePath
+dsDir = "dataset"
+
+composerFile :: Composer -> FilePath
+composerFile Bach      = "bach.csv"
+composerFile Beethoven = "beethoven.csv"
+composerFile Horetzky  = "horetzky.csv"
+
 -- this assumes that the filepaths are in the first column
 csvToListOfFiles :: CSV -> [FilePath]
 csvToListOfFiles c =
   let col = init . tail . getColumn 0 $ c
   in col
+
+--------------------------------------------------------------------------------
+--                                Partitioning                                --
+--------------------------------------------------------------------------------
+{-
+Ideally, I would like to have the ability to partition data randomly. I would
+like to have a 50/25/25 partition and a 70/30 partition
+-}
+
+trainValidTestPartition :: DataSet -> (DataSet,DataSet,DataSet)
+trainValidTestPartition = undefined
+
+trainTestPartition :: DataSet -> (DataSet,DataSet)
+trainTestPartition = undefined
+
+
+--------------------------------------------------------------------------------
+--                                 Summaries                                  --
+--------------------------------------------------------------------------------
 
 scoreSummary :: Score (KeySig,TimeSig) -> IO ()
 scoreSummary score =
