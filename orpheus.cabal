@@ -13,8 +13,10 @@ extra-source-files:  ChangeLog.md
 cabal-version:       >=1.10
 
 library
-  exposed-modules:     Orpheus.Model.Generative.Diatonic,
+  exposed-modules:     Orpheus.Model.Generative,
+                       Orpheus.Model.Generative.Diatonic,
                        Orpheus.Model.Generative.Length,
+                       Orpheus.Model.Discriminative,
                        Orpheus.Model.Discriminative.DecisionTree,
                        Orpheus.Model.Discriminative.MajorityClass,
                        Orpheus.Model.Discriminative.RandomForest,
