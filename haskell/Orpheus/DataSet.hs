@@ -84,9 +84,10 @@ scoreSummary :: Score (KeySig,TimeSig) -> IO ()
 scoreSummary score =
   case score of
     Score parts -> do
-      putStrLn $ "Number of parts: " ++ (show . length $ parts)
+      putStrLn . concat $ ["Number of parts: ",show . length $ parts]
       case head parts of
-        Part (Voice xs) -> putStrLn $ "Number of measures: " ++ (show . length $ xs)
+        Part (Voice xs) ->
+          putStrLn . concat $ ["Number of measures: ",show . length $ xs]
 
 
 datasetSummary :: DataSet -> IO ()
