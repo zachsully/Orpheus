@@ -64,7 +64,7 @@ featureKeySig :: DataSet -> FeatureSet
 featureKeySig ds = fmap (\e@(_,c) ->
                           let counts' = counts e
                           in (fmap (\k -> case HM.lookup k counts' of
-                                 Just x  -> x
+                                 Just x  -> 1
                                  Nothing -> 0) unique)
                           ++ [featureComposer c])
                         ds
@@ -81,7 +81,7 @@ featureTimeSig :: DataSet -> FeatureSet
 featureTimeSig ds = fmap (\e@(_,c) ->
                           let counts' = counts e
                           in (fmap (\k -> case HM.lookup k counts' of
-                                 Just x  -> x
+                                 Just x  -> 1
                                  Nothing -> 0) unique)
                           ++ [featureComposer c])
                         ds
