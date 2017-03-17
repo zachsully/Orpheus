@@ -28,6 +28,7 @@ library
                        Orpheus.Data.Music.Chord,
                        Orpheus.Data.Music.Nursery,
                        Orpheus.Data.Music.Context,
+                       Orpheus.Data.Feature,
                        Orpheus.DataSet,
                        Data.Lilypond.Pretty,
                        Data.Lilypond.Parser
