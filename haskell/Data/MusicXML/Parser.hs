@@ -72,7 +72,8 @@ arrVoice
 arrMeasure :: SLA (Ctx,Rational) XmlTree (Ctx,[[Primitive]])
 arrMeasure
   =   (perform ((listA returnA) >>> arrContext >>> setState))
-  >>> arrParPrimitive
+  >>> listA (returnA)
+  >>> (getState >>^ fst) &&& arrParPrimitive
 
 -- A context here, represents the KeySignature,TimeSignature
 -- we also attach a divisions integer that will be used for deciding note length
@@ -124,15 +125,18 @@ pass the primitive information as a list to each arrow
 -}
 -- A chord in MusicXml is a series of notes that where the 2nd,...,nth
 -- note also contains the element <chord/>
-arrParPrimitive :: SLA (Ctx,Rational) XmlTree (Ctx,[[Primitive]])
-arrParPrimitive = (getState >>^ fst) &&& (hasName "note" >>> listA arrSeqPrimitive)
+arrParPrimitive :: SLA (Ctx,Rational) [XmlTree] [[Primitive]]
+arrParPrimitive
+  =   unlistA
+  >>> hasName "note"
+  >>> listA (listA arrSeqPrimitive)
 
 -- primitives are just notes and rests, will probably need to handle
 -- chords here as well
-arrSeqPrimitive :: SLA (Ctx,Rational) XmlTree [Primitive]
+arrSeqPrimitive :: SLA (Ctx,Rational) XmlTree Primitive
 arrSeqPrimitive
   =   listA (hasName "note" >>> getChildren) -- pass all "note" information to subarrows
-  >>> listA (arrNote <+> arrRest)
+  >>> (arrNote <+> arrRest)
 
 arrNote :: SLA (Ctx,Rational) [XmlTree] Primitive
 arrNote
