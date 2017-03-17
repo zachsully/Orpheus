@@ -69,6 +69,7 @@ executable orpheus
                        text                 >= 1.2,
                        hakaru               >= 0.3,
                        optparse-applicative >= 0.11 && < 0.14,
+                       containers           >= 0.5,
                        orpheus              >= 0.0
 
 

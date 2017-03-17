@@ -17,6 +17,7 @@ import Orpheus.Model.Discriminative
 import Orpheus.DataSet
 import Orpheus.Data.Feature
 
+import qualified Data.Set as Set
 import Data.Monoid
 import Data.MusicXML.Parser
 import Options.Applicative
@@ -57,9 +58,12 @@ main = do
     Test fin -> do putStrLn $ "MODE: Test, " ++ fin ++ "..."
                    xmlParseTest fin
                    ds <- getDataSet
-                   print $ uniqueKeySig ds
-                   print $ uniqueTimeSig ds
-                   print $ uniquePrimitive ds
+                   let k = uniqueKeySig ds
+                       t = uniqueTimeSig ds
+                       p = uniquePrimitive ds
+                   print $ (Set.size k,k)
+                   print $ (Set.size t,t)
+                   print $ (Set.size p,p)
     Run -> do putStrLn "MODE: Run..."
               putStrLn "Parsing dataset..."
               ds <- getDataSet
