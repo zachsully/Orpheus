@@ -28,6 +28,7 @@ import Options.Applicative
 --------------------------------------------------------------------------------
 data Mode
   = Test FilePath
+  | Feature
   | Run
   deriving (Show,Eq)
 
@@ -37,33 +38,42 @@ data Options = Options { mode :: Mode }
 parseTest :: Parser Mode
 parseTest = Test <$> strArgument (metavar "FILE" <> help "xml file to test")
 
+parseFeature :: Parser Mode
+parseFeature = pure Feature
+
 parseRun :: Parser Mode
 parseRun = pure Run
 
-options :: Parser Options
-options = Options <$> (parseTest <|> parseRun)
+options' :: Parser Mode
+options' = subparser
+  $  (command "test" (info (helper <*> parseTest)
+                           (progDesc "xml parser test")))
+  <> (command "feature" (info (helper <*> parseFeature)
+                              (progDesc "extract features from dataset")))
+  <> (command "run" (info (helper <*> parseRun)
+                          (progDesc "run whole orpheus pipeline")))
 
-parseOpts :: IO Options
+parseOpts :: IO Mode
 parseOpts = execParser
-          $ info (helper <*> options)
-          $ fullDesc <> progDesc "Orpheus, a musician, a poet"
+          $ info (helper <*> options')
+          $ fullDesc <> progDesc "Orpheus: disect musical scores"
 
 
 --------------------------------------------------------------------------------
 
 main :: IO ()
 main = do
-  opts <- parseOpts
-  case mode opts of
+  m <- parseOpts
+  case m of
     Test fin -> do putStrLn $ "MODE: Test, " ++ fin ++ "..."
                    xmlParseTest fin
-                   ds <- getDataSet
-                   let k = uniqueKeySig ds
-                       t = uniqueTimeSig ds
-                       p = uniquePrimitive ds
-                   print $ (Set.size k,k)
-                   print $ (Set.size t,t)
-                   print $ (Set.size p,p)
+    Feature -> do ds <- getDataSet
+                  let k = uniqueKeySig ds
+                      t = uniqueTimeSig ds
+                      p = uniquePrimitive ds
+                  print $ (Set.size k,k)
+                  print $ (Set.size t,t)
+                  print $ (Set.size p,p)
     Run -> do putStrLn "MODE: Run..."
               putStrLn "Parsing dataset..."
               ds <- getDataSet
