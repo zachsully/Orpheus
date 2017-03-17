@@ -48,7 +48,7 @@ data Instrument
 --------------------------------------------------------------------------------
 
 data Pitchclass = A | B | C | D | E | F | G
-  deriving (Show,Eq)
+  deriving (Show,Eq,Ord)
 
 --------------------------------------------------------------------------------
 --                                    Note                                    --
@@ -58,7 +58,7 @@ data Accidental
   = Sharp Int
   | Flat Int
   | Natural
-  deriving (Show,Eq)
+  deriving (Show,Eq,Ord)
 
 data Duration = Duration Rational
   deriving (Show,Eq,Ord)
@@ -68,4 +68,4 @@ type Octave = Int
 data Primitive
   = Note Pitchclass Octave Accidental Duration
   | Rest Duration
-  deriving (Show,Eq)
+  deriving (Show,Eq,Ord)

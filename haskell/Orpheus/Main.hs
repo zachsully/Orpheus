@@ -15,6 +15,7 @@ module Main where
 
 import Orpheus.Model.Discriminative
 import Orpheus.DataSet
+import Orpheus.Data.Feature
 
 import Data.Monoid
 import Data.MusicXML.Parser
@@ -55,6 +56,10 @@ main = do
   case mode opts of
     Test fin -> do putStrLn $ "MODE: Test, " ++ fin ++ "..."
                    xmlParseTest fin
+                   ds <- getDataSet
+                   print $ uniqueKeySig ds
+                   print $ uniqueTimeSig ds
+                   print $ uniquePrimitive ds
     Run -> do putStrLn "MODE: Run..."
               putStrLn "Parsing dataset..."
               ds <- getDataSet
