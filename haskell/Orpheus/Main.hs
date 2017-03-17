@@ -16,8 +16,6 @@ module Main where
 import Orpheus.Model.Discriminative
 import Orpheus.DataSet
 import Orpheus.Data.Feature
-
-import qualified Data.Set as Set
 import Data.Monoid
 import Data.MusicXML.Parser
 import Options.Applicative
@@ -67,13 +65,15 @@ main = do
   case m of
     Test fin -> do putStrLn $ "MODE: Test, " ++ fin ++ "..."
                    xmlParseTest fin
-    Feature -> do ds <- getDataSet
-                  let k = uniqueKeySig ds
-                      t = uniqueTimeSig ds
-                      p = uniquePrimitive ds
-                  print $ (Set.size k,k)
-                  print $ (Set.size t,t)
-                  print $ (Set.size p,p)
+    Feature -> do putStrLn $ "MODE: Feature..."
+                  putStrLn "Parsing dataset..."
+                  ds <- getDataSet
+                  putStrLn "Writing dataset/keysig.csv"
+                  writeFeatureSet "dataset/keysig.csv" (featureKeySig ds)
+                  putStrLn "Writing dataset/timesig.csv"
+                  writeFeatureSet "dataset/timesig.csv" (featureTimeSig ds)
+                  putStrLn "Writing dataset/primitive.csv"
+                  writeFeatureSet "dataset/primitive.csv" (featurePrimitive ds)
     Run -> do putStrLn "MODE: Run..."
               putStrLn "Parsing dataset..."
               ds <- getDataSet

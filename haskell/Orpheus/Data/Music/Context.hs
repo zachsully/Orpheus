@@ -1,4 +1,8 @@
+{-# LANGUAGE DeriveGeneric #-}
 module Orpheus.Data.Music.Context where
+
+import GHC.Generics (Generic)
+import Data.Hashable
 
 --------------------------------------------------------------------------------
 --                                   Score                                    --
@@ -34,10 +38,13 @@ data Tempo = Tempo Int
 data KeySig
   = Major Int
   | Minor Int
-  deriving (Show,Eq,Ord)
+  deriving (Show,Eq,Ord,Generic)
+instance Hashable KeySig
+
 
 data TimeSig = TimeSig Int Int
-  deriving (Show,Eq,Ord)
+  deriving (Show,Eq,Ord,Generic)
+instance Hashable TimeSig
 
 data Dynamic
 
@@ -48,7 +55,9 @@ data Instrument
 --------------------------------------------------------------------------------
 
 data Pitchclass = A | B | C | D | E | F | G
-  deriving (Show,Eq,Ord)
+  deriving (Show,Eq,Ord,Generic)
+instance Hashable Pitchclass
+
 
 --------------------------------------------------------------------------------
 --                                    Note                                    --
@@ -58,14 +67,17 @@ data Accidental
   = Sharp Int
   | Flat Int
   | Natural
-  deriving (Show,Eq,Ord)
+  deriving (Show,Eq,Ord,Generic)
+instance Hashable Accidental
 
 data Duration = Duration Rational
-  deriving (Show,Eq,Ord)
+  deriving (Show,Eq,Ord,Generic)
+instance Hashable Duration
 
 type Octave = Int
 
 data Primitive
   = Note Pitchclass Octave Accidental Duration
   | Rest Duration
-  deriving (Show,Eq,Ord)
+  deriving (Show,Eq,Ord,Generic)
+instance Hashable Primitive

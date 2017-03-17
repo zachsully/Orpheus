@@ -1,7 +1,6 @@
 module Orpheus.Data.Feature where
 
 import qualified Data.HashMap.Lazy as HM
-import Data.Hashable
 import qualified Data.Set as Set
 import Orpheus.DataSet
 import Orpheus.Data.Music.Context
@@ -62,22 +61,67 @@ featureComposer Beethoven = 2
 featureComposer Horetzky  = 3
 
 featureKeySig :: DataSet -> FeatureSet
-featureKeySig ds =
-  let sigs = Set.toList . uniqueKeySig $ ds
-      counts = foldr (\(_,y) hashmap -> HM.insertWith (+) y (1::Int) hashmap)
-                       HM.empty
-                       ds
-  in undefined
+featureKeySig ds = fmap (\e@(_,c) ->
+                          let counts' = counts e
+                          in (fmap (\k -> case HM.lookup k counts' of
+                                 Just x  -> x
+                                 Nothing -> 0) unique)
+                          ++ [featureComposer c])
+                        ds
+  where counts :: (Score (KeySig,TimeSig), Composer) -> HM.HashMap KeySig Int
+        counts (Score ps,_) = (featureKeySig' ps)
+        featureKeySig' = foldr (\(Part (Voice vs)) sigs ->
+                                HM.unionWith (+) (featureKeySig'' vs) sigs)
+                               HM.empty
+        featureKeySig'' = foldr (\((key,_),_) sigs -> HM.insertWith (+) key 1 sigs)
+                                HM.empty
+        unique = Set.toList . uniqueKeySig $ ds
 
 featureTimeSig :: DataSet -> FeatureSet
-featureTimeSig ds =
-  let sigs = Set.toList . uniqueTimeSig $ ds
-  in undefined
+featureTimeSig ds = fmap (\e@(_,c) ->
+                          let counts' = counts e
+                          in (fmap (\k -> case HM.lookup k counts' of
+                                 Just x  -> x
+                                 Nothing -> 0) unique)
+                          ++ [featureComposer c])
+                        ds
+  where counts :: (Score (KeySig,TimeSig), Composer) -> HM.HashMap TimeSig Int
+        counts (Score ps,_) = (featureTimeSig' ps)
+        featureTimeSig' = foldr (\(Part (Voice vs)) sigs ->
+                                HM.unionWith (+) (featureTimeSig'' vs) sigs)
+                               HM.empty
+        featureTimeSig'' = foldr (\((_,time),_) sigs -> HM.insertWith (+) time 1 sigs)
+                                HM.empty
+        unique = Set.toList . uniqueTimeSig $ ds
 
 featurePrimitive :: DataSet -> FeatureSet
-featurePrimitive ds =
-  let prims = Set.toList . uniquePrimitive $ ds
-  in undefined
+featurePrimitive ds = fmap (\e@(_,c) ->
+                             let counts' = counts e
+                             in (fmap (\k -> case HM.lookup k counts' of
+                                               Just x  -> x
+                                               Nothing -> 0
+                                      )
+                                      unique
+                                ) ++ [featureComposer c]
+                          )
+                          ds
+  where counts :: (Score (KeySig,TimeSig), Composer) -> HM.HashMap Primitive Int
+        counts (Score ps,_) = featurePrimitive' ps
+        featurePrimitive' = foldr (\(Part (Voice vs)) sigs ->
+                                    HM.unionWith (+) (featurePrimitive'' vs) sigs
+                                  )
+                                  HM.empty
+        featurePrimitive'' = foldr (\((_,_),prims) hm ->
+                                     foldr (\ss hm' ->
+                                             foldr (\p -> HM.insertWith (+) p (1::Int))
+                                                   hm'
+                                                   ss
+                                           )
+                                           hm
+                                           prims
+                                   )
+                                   HM.empty
+        unique = Set.toList . uniquePrimitive $ ds
 
 --------------------------------------------------------------------------------
 --                                     IO                                     --
