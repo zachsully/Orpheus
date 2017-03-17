@@ -49,6 +49,7 @@ library
                        mtl                  >= 2.2,
                        csv                  >= 0.1,
                        filepath             >= 1.4,
+                       containers           >= 0.5,
                        unordered-containers >= 0.2,
                        random-shuffle       >= 0.0,
                        random               >= 1.1,

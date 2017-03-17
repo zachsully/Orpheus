@@ -34,10 +34,10 @@ data Tempo = Tempo Int
 data KeySig
   = Major Int
   | Minor Int
-  deriving (Show,Eq)
+  deriving (Show,Eq,Ord)
 
 data TimeSig = TimeSig Int Int
-  deriving (Show,Eq)
+  deriving (Show,Eq,Ord)
 
 data Dynamic
 
