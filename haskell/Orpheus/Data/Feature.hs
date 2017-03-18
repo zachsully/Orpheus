@@ -44,6 +44,11 @@ uniquePrimitive = foldr (\(Score ps,_) sigs ->
                                          prims)
                                   Set.empty
 
+uniqueDuration :: DataSet -> Set.Set Duration
+uniqueDuration = undefined
+
+uniquePitchclass :: DataSet -> Set.Set Pitchclass
+uniquePitchclass = undefined
 
 --------------------------------------------------------------------------------
 --                               Feature Maps                                 --
@@ -122,6 +127,14 @@ featurePrimitive ds = fmap (\e@(_,c) ->
                                    )
                                    HM.empty
         unique = Set.toList . uniquePrimitive $ ds
+
+
+featureDuration :: DataSet -> FeatureSet
+featureDuration = undefined
+
+featurePitchclass :: DataSet -> FeatureSet
+featurePitchclass = undefined
+
 
 --------------------------------------------------------------------------------
 --                                     IO                                     --
