@@ -25,7 +25,7 @@ import Options.Applicative
 --                             Executable Options                             --
 --------------------------------------------------------------------------------
 data Mode
-  = Test FilePath
+  = Parse FilePath (Maybe FilePath)
   | Feature
   | Run
   deriving (Show,Eq)
@@ -34,7 +34,9 @@ data Options = Options { mode :: Mode }
   deriving (Show,Eq)
 
 parseTest :: Parser Mode
-parseTest = Test <$> strArgument (metavar "FILE" <> help "xml file to test")
+parseTest = Parse
+        <$> strArgument (metavar "INPUT" <> help "input musical file")
+        <*> optional (strArgument (metavar "OUTPUT" <> help "xml file output"))
 
 parseFeature :: Parser Mode
 parseFeature = pure Feature
@@ -44,8 +46,8 @@ parseRun = pure Run
 
 options' :: Parser Mode
 options' = subparser
-  $  (command "test" (info (helper <*> parseTest)
-                           (progDesc "xml parser test")))
+  $  (command "parse" (info (helper <*> parseTest)
+                            (progDesc "xml parser test")))
   <> (command "feature" (info (helper <*> parseFeature)
                               (progDesc "extract features from dataset")))
   <> (command "run" (info (helper <*> parseRun)
@@ -58,31 +60,37 @@ parseOpts = execParser
 
 
 --------------------------------------------------------------------------------
+--                                  MAIN                                      --
+--------------------------------------------------------------------------------
 
 main :: IO ()
 main = do
   m <- parseOpts
   case m of
-    Test fin -> do putStrLn $ "MODE: Test, " ++ fin ++ "..."
-                   xmlParseTest fin
-    Feature -> do putStrLn $ "MODE: Feature..."
-                  putStrLn "Parsing dataset..."
-                  ds <- getDataSet
-                  let ds' = rPermute (length ds) ds
-                  putStrLn "Writing dataset/keysig.csv"
-                  writeFeatureSet "dataset/keysig.csv" (featureKeySig ds')
-                  putStrLn "Writing dataset/timesig.csv"
-                  writeFeatureSet "dataset/timesig.csv" (featureTimeSig ds')
-                  putStrLn "Writing dataset/primitive.csv"
-                  writeFeatureSet "dataset/primitive.csv" (featurePrimitive ds')
-    Run -> do putStrLn "MODE: Run..."
-              putStrLn "Parsing dataset..."
-              ds <- getDataSet
-              datasetSummary ds
-              classifierSummary ds
+    Parse fin fout -> do
+      putStrLn "MODE: Parse"
+      putStrLn $ "Parsing file " ++ fin ++ "..."
+      score <- parseMusicXMLFile fin
+      scoreSummary score
+      case fout of
+        Nothing -> putStrLn . show $ score
+        Just f -> writeFile f . show $ score
 
-xmlParseTest :: FilePath -> IO ()
-xmlParseTest fp = do
-  score <- parseMusicXMLFile fp
-  print score
-  scoreSummary score
+    Feature -> do
+      putStrLn "MODE: Feature..."
+      putStrLn "Parsing dataset..."
+      ds <- getDataSet
+      let ds' = rPermute (length ds) ds
+      putStrLn "Writing dataset/keysig.csv"
+      writeFeatureSet "dataset/keysig.csv" (featureKeySig ds')
+      putStrLn "Writing dataset/timesig.csv"
+      writeFeatureSet "dataset/timesig.csv" (featureTimeSig ds')
+      putStrLn "Writing dataset/primitive.csv"
+      writeFeatureSet "dataset/primitive.csv" (featurePrimitive ds')
+
+    Run -> do
+      putStrLn "MODE: Run..."
+      putStrLn "Parsing dataset..."
+      ds <- getDataSet
+      datasetSummary ds
+      classifierSummary ds
