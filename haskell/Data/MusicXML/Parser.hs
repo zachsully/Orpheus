@@ -60,8 +60,9 @@ arrPart = arrVoice >>^ Part
 --   monad that holds a parasing context
 arrVoice :: (ArrowXml a) => a [XmlTree] (Voice Ctx)
 arrVoice
-  =   fromSLA initState
-              (listA (unlistA >>> hasName "measure" /> arrMeasure))
+  =   fromSLA initState (listA (unlistA >>> hasName "measure"
+                                        >>> listA getChildren
+                                        >>> arrMeasure))
   >>^ Voice
   where initState = error "no state set" :: (Ctx,Rational)
 
@@ -69,10 +70,9 @@ arrVoice
 -- > they can also contain attributes including contexts for the next sequence
 --   of notes
 -- ^ Takes children of a measure node and a state
-arrMeasure :: SLA (Ctx,Rational) XmlTree (Ctx,[[Primitive]])
+arrMeasure :: SLA (Ctx,Rational) [XmlTree] (Ctx,[[Primitive]])
 arrMeasure
-  =   (perform ((listA returnA) >>> arrContext >>> setState))
-  >>> listA (returnA)
+  =   perform (arrContext >>> setState)
   >>> (getState >>^ fst) &&& arrParSeqPrimitive
 
 -- A context here, represents the KeySignature,TimeSignature
@@ -127,11 +127,10 @@ pass the primitive information as a list to each arrow
 -- note also contains the element <chord/>
 arrParSeqPrimitive :: SLA (Ctx,Rational) [XmlTree] [[Primitive]]
 arrParSeqPrimitive
-  =   (unlistA >>> hasName "note" >>> listA returnA)
-  >>> listA arrSeqPrimitive
+  =   listA arrSeqPrimitive
 
 arrSeqPrimitive :: SLA (Ctx,Rational) [XmlTree] [Primitive]
-arrSeqPrimitive = unlistA >>> listA arrPrimitive
+arrSeqPrimitive = unlistA >>> hasName "note" >>> listA arrPrimitive
 
 -- primitives are just notes and rests, will probably need to handle
 -- chords here as well
@@ -161,7 +160,7 @@ arrDuration
   >>> (hasName "duration" /> getText)
   >>> (accessState $ \(_,divs) t ->
          case (read t :: Int) of
-            int -> Duration (4 * (toRational int) / divs))
+            int -> Duration ((toRational int) / (4 * divs)))
 
 -------------
 -- Pitches --
