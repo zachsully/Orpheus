@@ -81,12 +81,12 @@ main = do
       putStrLn "Parsing dataset..."
       ds <- getDataSet
       let ds' = rPermute (length ds) ds
-      putStrLn "Writing dataset/keysig.csv"
-      writeFeatureSet "dataset/keysig.csv" (featureKeySig ds')
-      putStrLn "Writing dataset/timesig.csv"
-      writeFeatureSet "dataset/timesig.csv" (featureTimeSig ds')
-      putStrLn "Writing dataset/primitive.csv"
-      writeFeatureSet "dataset/primitive.csv" (featurePrimitive ds')
+      putStrLn "Writing dataset/feature/keysig.csv"
+      writeFeatureSet "dataset/feature/keysig.csv" (featureKeySig ds')
+      putStrLn "Writing dataset/feature/timesig.csv"
+      writeFeatureSet "dataset/feature/timesig.csv" (featureTimeSig ds')
+      putStrLn "Writing dataset/feature/primitive.csv"
+      writeFeatureSet "dataset/feature/primitive.csv" (featurePrimitive ds')
 
     Run -> do
       putStrLn "MODE: Run..."
