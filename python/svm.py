@@ -5,7 +5,8 @@ from sklearn import svm
 
 feature_files = ["dataset/feature/timesig.csv",
                  "dataset/feature/keysig.csv",
-                 "dataset/feature/primitive.csv"]
+                 "dataset/feature/primitive.csv",
+                 "dataset/feature/all.csv"]
 
 def read_data(filename):
   f = open(filename, 'r')

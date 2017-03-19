@@ -87,6 +87,8 @@ main = do
       writeFeatureSet "dataset/feature/timesig.csv" (featureTimeSig ds')
       putStrLn "Writing dataset/feature/primitive.csv"
       writeFeatureSet "dataset/feature/primitive.csv" (featurePrimitive ds')
+      putStrLn "Writing dataset/feature/all.csv"
+      writeFeatureSet "dataset/feature/all.csv" (featureAll ds')
 
     Run -> do
       putStrLn "MODE: Run..."

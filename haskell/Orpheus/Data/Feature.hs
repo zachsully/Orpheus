@@ -66,42 +66,57 @@ featureComposer Beethoven = 2
 featureComposer Horetzky  = 3
 
 featureKeySig :: DataSet -> FeatureSet
-featureKeySig ds = fmap (\e@(_,c) ->
-                          let counts' = counts e
-                          in (fmap (\k -> case HM.lookup k counts' of
-                                 Just x  -> 1
-                                 Nothing -> 0) unique)
-                          ++ [featureComposer c])
-                        ds
-  where counts :: (Score (KeySig,TimeSig), Composer) -> HM.HashMap KeySig Int
-        counts (Score ps,_) = (featureKeySig' ps)
-        featureKeySig' = foldr (\(Part (Voice vs)) sigs ->
+featureKeySig ds =
+  fmap (\e@(_,c) ->
+         let counts' = bucketKeySig e
+         in (fmap (\k -> case HM.lookup k counts' of
+                           Just x  -> 1
+                           Nothing -> 0
+                  )
+                  unique
+            ) ++ [featureComposer c]
+       )
+       ds
+  where unique = Set.toList . uniqueKeySig $ ds
+
+bucketKeySig
+  :: (Score (KeySig,TimeSig), Composer)
+  -> HM.HashMap KeySig Int
+bucketKeySig (Score ps,_) = featureKeySig' ps
+  where featureKeySig' = foldr (\(Part (Voice vs)) sigs ->
                                 HM.unionWith (+) (featureKeySig'' vs) sigs)
                                HM.empty
         featureKeySig'' = foldr (\((key,_),_) sigs -> HM.insertWith (+) key 1 sigs)
                                 HM.empty
-        unique = Set.toList . uniqueKeySig $ ds
+
 
 featureTimeSig :: DataSet -> FeatureSet
 featureTimeSig ds = fmap (\e@(_,c) ->
-                          let counts' = counts e
+                          let counts' = bucketTimeSig e
                           in (fmap (\k -> case HM.lookup k counts' of
-                                 Just x  -> 1
-                                 Nothing -> 0) unique)
-                          ++ [featureComposer c])
-                        ds
-  where counts :: (Score (KeySig,TimeSig), Composer) -> HM.HashMap TimeSig Int
-        counts (Score ps,_) = (featureTimeSig' ps)
-        featureTimeSig' = foldr (\(Part (Voice vs)) sigs ->
+                                            Just x  -> 1
+                                            Nothing -> 0
+                                   )
+                                   unique
+                             ) ++ [featureComposer c]
+                         )
+                         ds
+  where unique = Set.toList . uniqueTimeSig $ ds
+
+bucketTimeSig
+  :: (Score (KeySig,TimeSig), Composer)
+  -> HM.HashMap TimeSig Int
+bucketTimeSig (Score ps,_) = featureTimeSig' ps
+  where featureTimeSig' = foldr (\(Part (Voice vs)) sigs ->
                                 HM.unionWith (+) (featureTimeSig'' vs) sigs)
                                HM.empty
         featureTimeSig'' = foldr (\((_,time),_) sigs -> HM.insertWith (+) time 1 sigs)
                                 HM.empty
-        unique = Set.toList . uniqueTimeSig $ ds
+
 
 featurePrimitive :: DataSet -> FeatureSet
 featurePrimitive ds = fmap (\e@(_,c) ->
-                             let counts' = counts e
+                             let counts' = bucketPrimitive e
                              in (fmap (\k -> case HM.lookup k counts' of
                                                Just x  -> x
                                                Nothing -> 0
@@ -110,9 +125,13 @@ featurePrimitive ds = fmap (\e@(_,c) ->
                                 ) ++ [featureComposer c]
                           )
                           ds
-  where counts :: (Score (KeySig,TimeSig), Composer) -> HM.HashMap Primitive Int
-        counts (Score ps,_) = featurePrimitive' ps
-        featurePrimitive' = foldr (\(Part (Voice vs)) sigs ->
+  where unique = Set.toList . uniquePrimitive $ ds
+
+bucketPrimitive
+  :: (Score (KeySig,TimeSig), Composer)
+  -> HM.HashMap Primitive Int
+bucketPrimitive (Score ps,_) = featurePrimitive' ps
+  where featurePrimitive' = foldr (\(Part (Voice vs)) sigs ->
                                     HM.unionWith (+) (featurePrimitive'' vs) sigs
                                   )
                                   HM.empty
@@ -126,7 +145,6 @@ featurePrimitive ds = fmap (\e@(_,c) ->
                                            prims
                                    )
                                    HM.empty
-        unique = Set.toList . uniquePrimitive $ ds
 
 
 featureDuration :: DataSet -> FeatureSet
@@ -135,6 +153,34 @@ featureDuration = undefined
 featurePitchclass :: DataSet -> FeatureSet
 featurePitchclass = undefined
 
+featureAll :: DataSet -> FeatureSet
+featureAll ds = fmap (\e@(_,c) ->
+                       let cKeySig  = bucketKeySig e
+                           cTimeSig = bucketTimeSig e
+                           cPrims   = bucketPrimitive e
+                       in (fmap (\k -> case HM.lookup k cKeySig of
+                                         Just x  -> x
+                                         Nothing -> 0
+                                )
+                                uKeySig
+                          ) ++
+                          (fmap (\k -> case HM.lookup k cTimeSig of
+                                         Just x  -> x
+                                         Nothing -> 0
+                                )
+                                uTimeSig
+                          ) ++
+                          (fmap (\k -> case HM.lookup k cPrims of
+                                         Just x  -> x
+                                         Nothing -> 0
+                                )
+                                uPrimitive
+                          ) ++ [featureComposer c]
+                     )
+                     ds
+  where uKeySig    = Set.toList . uniqueKeySig    $ ds
+        uTimeSig   = Set.toList . uniqueTimeSig   $ ds
+        uPrimitive = Set.toList . uniquePrimitive $ ds
 
 --------------------------------------------------------------------------------
 --                                     IO                                     --
