@@ -2,16 +2,16 @@ import sys
 import re
 import math
 from util import *
-from sklearn import svm
+from sklearn.ensemble import RandomForestClassifier
 
-def classify_feature_set(filename):
+def classify_feature_set(filename,n):
   # load and partition data
   (feature_data,label_data) = read_data(filename)
   size = len(feature_data)
   split = int(math.ceil(size * 0.7))
 
   # Train model
-  classifier = svm.LinearSVC()
+  classifier = RandomForestClassifier(n_estimators=n)
   classifier.fit(feature_data[:split],label_data[:split])
 
   # Test classifier
@@ -39,9 +39,13 @@ def classify_feature_set(filename):
   print "Accuracy: " + str(float(correct)/float(num)) + "\n"
 
 def main(argv):
-  print "SVM Classifier:"
+  if len(argv) is 1:
+    x = int(argv[0])
+  else:
+    x = 10
+  print "Random Forest Classifier: n=" + str(x)
   for fs in feature_files:
-    classify_feature_set(fs)
+    classify_feature_set(fs,x)
 
 if __name__ == "__main__":
   main(sys.argv[1:])
