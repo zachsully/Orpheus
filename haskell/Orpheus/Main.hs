@@ -19,6 +19,7 @@ import Orpheus.Data.Feature
 import Data.Monoid
 import Data.MusicXML.Parser
 import Options.Applicative
+import qualified Data.HashMap.Lazy as HM
 
 
 --------------------------------------------------------------------------------
@@ -27,6 +28,7 @@ import Options.Applicative
 data Mode
   = Parse FilePath (Maybe FilePath)
   | Feature (Maybe String)
+  | Total
   | Run
   deriving (Show,Eq)
 
@@ -48,12 +50,17 @@ parseFeature = Feature
 parseRun :: Parser Mode
 parseRun = pure Run
 
+parseTotal :: Parser Mode
+parseTotal = pure Total
+
 options' :: Parser Mode
 options' = subparser
   $  (command "parse" (info (helper <*> parseTest)
                             (progDesc "xml parser test")))
   <> (command "feature" (info (helper <*> parseFeature)
                               (progDesc "extract features from dataset")))
+  <> (command "total" (info (helper <*> parseTotal)
+                              (progDesc "count number of notes")))
   <> (command "run" (info (helper <*> parseRun)
                           (progDesc "run whole orpheus pipeline")))
 
@@ -95,6 +102,16 @@ main = do
       writeFeatureSet "dataset/feature/primitive.csv" (featurePrimitive ds')
       putStrLn "Writing dataset/feature/all.csv"
       writeFeatureSet "dataset/feature/all.csv" (featureAll ds')
+
+    Total -> do
+      ds <- getDataSet
+      let infos = fmap (\a@(_,c) -> (c,bucketPrimitive a)) ds
+          cAndC = fmap (\(c,x) -> (c,sum . HM.elems $ x)) infos
+          countC = foldr (\(c,f) (x,y,z) -> case c of
+                                              Bach -> (f+x,y,z)
+                                              Beethoven -> (x,f+y,z)
+                                              Horetzky -> (x,y,z+f)) (0,0,0) cAndC
+      putStrLn . show $ countC
 
     Run -> do
       putStrLn "MODE: Run..."
