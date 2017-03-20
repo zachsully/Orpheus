@@ -51,6 +51,62 @@ uniquePitchclass :: DataSet -> Set.Set Pitchclass
 uniquePitchclass = undefined
 
 --------------------------------------------------------------------------------
+--                              Feature Buckets                               --
+--------------------------------------------------------------------------------
+{-
+Buckets traverse an instance of the score and return a HashMap of counts of
+some feature
+-}
+bucketKeySig
+  :: (Score (KeySig,TimeSig), Composer)
+  -> HM.HashMap KeySig Int
+bucketKeySig (Score ps,_) = featureKeySig' ps
+  where featureKeySig' = foldr (\(Part (Voice vs)) sigs ->
+                                HM.unionWith (+) (featureKeySig'' vs) sigs)
+                               HM.empty
+        featureKeySig'' = foldr (\((key,_),_) sigs -> HM.insertWith (+) key 1 sigs)
+                                HM.empty
+
+bucketTimeSig
+  :: (Score (KeySig,TimeSig), Composer)
+  -> HM.HashMap TimeSig Int
+bucketTimeSig (Score ps,_) = featureTimeSig' ps
+  where featureTimeSig' = foldr (\(Part (Voice vs)) sigs ->
+                                HM.unionWith (+) (featureTimeSig'' vs) sigs)
+                               HM.empty
+        featureTimeSig'' = foldr (\((_,time),_) sigs -> HM.insertWith (+) time 1 sigs)
+                                HM.empty
+
+bucketPrimitive
+  :: (Score (KeySig,TimeSig), Composer)
+  -> HM.HashMap Primitive Int
+bucketPrimitive (Score ps,_) = featurePrimitive' ps
+  where featurePrimitive' = foldr (\(Part (Voice vs)) sigs ->
+                                    HM.unionWith (+) (featurePrimitive'' vs) sigs
+                                  )
+                                  HM.empty
+        featurePrimitive'' = foldr (\((_,_),prims) hm ->
+                                     foldr (\ss hm' ->
+                                             foldr (\p -> HM.insertWith (+) p (1::Int))
+                                                   hm'
+                                                   ss
+                                           )
+                                           hm
+                                           prims
+                                   )
+                                   HM.empty
+
+bucketDuration
+  :: (Score a, Composer)
+  -> HM.HashMap Duration Int
+bucketDuration = undefined
+
+bucketPitchclass
+  :: (Score a, Composer)
+  -> HM.HashMap Pitchclass Int
+bucketPitchclass = undefined
+
+--------------------------------------------------------------------------------
 --                               Feature Maps                                 --
 --------------------------------------------------------------------------------
 {-
@@ -79,17 +135,6 @@ featureKeySig ds =
        ds
   where unique = Set.toList . uniqueKeySig $ ds
 
-bucketKeySig
-  :: (Score (KeySig,TimeSig), Composer)
-  -> HM.HashMap KeySig Int
-bucketKeySig (Score ps,_) = featureKeySig' ps
-  where featureKeySig' = foldr (\(Part (Voice vs)) sigs ->
-                                HM.unionWith (+) (featureKeySig'' vs) sigs)
-                               HM.empty
-        featureKeySig'' = foldr (\((key,_),_) sigs -> HM.insertWith (+) key 1 sigs)
-                                HM.empty
-
-
 featureTimeSig :: DataSet -> FeatureSet
 featureTimeSig ds = fmap (\e@(_,c) ->
                           let counts' = bucketTimeSig e
@@ -103,17 +148,6 @@ featureTimeSig ds = fmap (\e@(_,c) ->
                          ds
   where unique = Set.toList . uniqueTimeSig $ ds
 
-bucketTimeSig
-  :: (Score (KeySig,TimeSig), Composer)
-  -> HM.HashMap TimeSig Int
-bucketTimeSig (Score ps,_) = featureTimeSig' ps
-  where featureTimeSig' = foldr (\(Part (Voice vs)) sigs ->
-                                HM.unionWith (+) (featureTimeSig'' vs) sigs)
-                               HM.empty
-        featureTimeSig'' = foldr (\((_,time),_) sigs -> HM.insertWith (+) time 1 sigs)
-                                HM.empty
-
-
 featurePrimitive :: DataSet -> FeatureSet
 featurePrimitive ds = fmap (\e@(_,c) ->
                              let counts' = bucketPrimitive e
@@ -126,26 +160,6 @@ featurePrimitive ds = fmap (\e@(_,c) ->
                           )
                           ds
   where unique = Set.toList . uniquePrimitive $ ds
-
-bucketPrimitive
-  :: (Score (KeySig,TimeSig), Composer)
-  -> HM.HashMap Primitive Int
-bucketPrimitive (Score ps,_) = featurePrimitive' ps
-  where featurePrimitive' = foldr (\(Part (Voice vs)) sigs ->
-                                    HM.unionWith (+) (featurePrimitive'' vs) sigs
-                                  )
-                                  HM.empty
-        featurePrimitive'' = foldr (\((_,_),prims) hm ->
-                                     foldr (\ss hm' ->
-                                             foldr (\p -> HM.insertWith (+) p (1::Int))
-                                                   hm'
-                                                   ss
-                                           )
-                                           hm
-                                           prims
-                                   )
-                                   HM.empty
-
 
 featureDuration :: DataSet -> FeatureSet
 featureDuration = undefined
