@@ -75,13 +75,13 @@ like to have a 50/25/25 partition and a 70/30 partition
 measurePartition :: a
 measurePartition = undefined
 
-rPermute :: Int -> [a] -> [a]
-rPermute len ds = shuffle' ds len (mkStdGen 0)
+rPermute :: Int -> Int -> [a] -> [a]
+rPermute seed len ds = shuffle' ds len (mkStdGen seed)
 
 trainValidTestPartition :: [a] -> ([a],[a],[a])
 trainValidTestPartition ds =
    let len = length ds
-       ds' = rPermute len ds
+       ds' = rPermute 0 len ds
        half    = ceiling (fromIntegral len * (0.5 :: Double))
        quarter = floor (fromIntegral len * (0.25 :: Double))
    in ( take half ds'
@@ -92,7 +92,7 @@ trainValidTestPartition ds =
 trainTestPartition :: [a] -> ([a],[a])
 trainTestPartition ds =
    let len = length ds
-       ds' = rPermute len ds
+       ds' = rPermute 0 len ds
        seventy = ceiling (fromIntegral len * (0.7 :: Double))
    in ( take seventy ds'
       , drop seventy $ ds'

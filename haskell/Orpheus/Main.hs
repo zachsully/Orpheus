@@ -26,7 +26,7 @@ import Options.Applicative
 --------------------------------------------------------------------------------
 data Mode
   = Parse FilePath (Maybe FilePath)
-  | Feature
+  | Feature (Maybe String)
   | Run
   deriving (Show,Eq)
 
@@ -39,7 +39,11 @@ parseTest = Parse
         <*> optional (strArgument (metavar "OUTPUT" <> help "xml file output"))
 
 parseFeature :: Parser Mode
-parseFeature = pure Feature
+parseFeature = Feature
+           <$> optional (strArgument
+                          (  metavar "SEED"
+                          <> help "random seed for feature permutation")
+                        )
 
 parseRun :: Parser Mode
 parseRun = pure Run
@@ -76,11 +80,13 @@ main = do
         Nothing -> putStrLn . show $ score
         Just f -> writeFile f . show $ score
 
-    Feature -> do
+    Feature mseed -> do
       putStrLn "MODE: Feature..."
       putStrLn "Parsing dataset..."
       ds <- getDataSet
-      let ds' = rPermute (length ds) ds
+      let ds' = case mseed of
+                  Just x  -> rPermute (read x) (length ds) ds
+                  Nothing -> rPermute 0 (length ds) ds
       putStrLn "Writing dataset/feature/keysig.csv"
       writeFeatureSet "dataset/feature/keysig.csv" (featureKeySig ds')
       putStrLn "Writing dataset/feature/timesig.csv"
