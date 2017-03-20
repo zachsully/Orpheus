@@ -40,7 +40,7 @@ def classify_feature_set(filename):
   print "Accuracy: " + str(float(correct)/float(num)) + "\n"
 
 def main(argv):
-  print "Logistic Regression Classifier:"
+  print "Multinomial Naive Bayes Classifier:"
   for fs in feature_files:
     classify_feature_set(fs)
 
