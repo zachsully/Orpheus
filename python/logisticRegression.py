@@ -7,15 +7,19 @@ from sklearn.linear_model import LogisticRegression
 def classify_feature_set(filename):
   # load and partition data
   (feature_data,label_data) = read_data(filename)
+
+  # split
   size = len(feature_data)
   split = int(math.ceil(size * 0.7))
+  train_f,train_l = (feature_data[:split],label_data[:split])
+  test_f,test_l = (feature_data[split:],label_data[split:])
 
   # Train model
   classifier = LogisticRegression()
-  classifier.fit(feature_data[:split],label_data[:split])
+  classifier.fit(test_f,test_l)
 
   # Test classifier
-  predictions = classifier.predict(feature_data[split:])
+  predictions = classifier.predict(test_f)
 
   # Summarize predictions
   num = len(predictions)
@@ -23,7 +27,7 @@ def classify_feature_set(filename):
   matrix = [[0 for _ in range(3)] for _ in range(3)]  # hardwired for 3 classes
   for i in range(num):
     predicted = predictions[i]
-    actual = ((label_data[split:])[i])
+    actual = test_l[i]
     matrix[predicted-1][actual-1] += 1
     if predicted == actual:
       correct += 1

@@ -6,7 +6,7 @@ feature_files = ["dataset/feature/timesig.csv",
                  "dataset/feature/primitive.csv",
                  "dataset/feature/all.csv"]
 
-def read_data_n(filename):
+def read_data(filename):
   f = open(filename, 'r')
   p = re.compile(',')
   feature_data = []
@@ -39,7 +39,7 @@ def read_data_h(filename):
       label_data.append(y)
   return (feature_data,label_data)
 
-def read_data(filename):
+def read_data_e(filename):
   f = open(filename, 'r')
   p = re.compile(',')
   feature_data = []
