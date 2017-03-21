@@ -29,7 +29,8 @@ data Mode
   = Parse FilePath (Maybe FilePath)
   | Feature (Maybe String)
   | Total
-  | Run
+  | DataSummary
+  | Run FilePath FilePath
   deriving (Show,Eq)
 
 data Options = Options { mode :: Mode }
@@ -47,8 +48,13 @@ parseFeature = Feature
                           <> help "random seed for feature permutation")
                         )
 
+parseDataSummary :: Parser Mode
+parseDataSummary = pure DataSummary
+
 parseRun :: Parser Mode
-parseRun = pure Run
+parseRun = Run
+       <$> strArgument (metavar "FEATURE SET" <> help "input of labelled feature set")
+       <*> strArgument (metavar "HK PROG" <> help "hakaru classifier program")
 
 parseTotal :: Parser Mode
 parseTotal = pure Total
@@ -61,8 +67,13 @@ options' = subparser
                               (progDesc "extract features from dataset")))
   <> (command "total" (info (helper <*> parseTotal)
                               (progDesc "count number of notes")))
-  <> (command "run" (info (helper <*> parseRun)
-                          (progDesc "run whole orpheus pipeline")))
+  <> (command "summary"
+              (info (helper <*> parseDataSummary)
+                      (progDesc "print a summary of xml data")))
+
+  <> (command "run"
+              (info (helper <*> parseRun)
+                      (progDesc "given a feature set and hakaru program, classify")))
 
 parseOpts :: IO Mode
 parseOpts = execParser
@@ -113,9 +124,15 @@ main = do
                                               Horetzky -> (x,y,z+f)) (0,0,0) cAndC
       putStrLn . show $ countC
 
-    Run -> do
-      putStrLn "MODE: Run..."
+    DataSummary -> do
+      putStrLn "MODE: Summary..."
       putStrLn "Parsing dataset..."
       ds <- getDataSet
       datasetSummary ds
       classifierSummary ds
+
+    Run _ _ -> do
+      putStrLn "MODE: Run..."
+      putStrLn "TODO"
+      -- > This program should run a hakaru classifier
+      -- > on a feature set
