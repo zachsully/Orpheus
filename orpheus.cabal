@@ -34,7 +34,10 @@ library
                        Data.Lilypond.Pretty,
                        Data.Lilypond.Parser
                        Data.MusicXML.Pretty,
-                       Data.MusicXML.Parser
+                       Data.MusicXML.Parser,
+
+                       Orpheus.Hakaru.Train,
+                       Orpheus.Hakaru.Predict
 
   other-extensions:    DataKinds, OverloadedStrings, TypeFamilies
 
@@ -53,7 +56,8 @@ library
                        unordered-containers >= 0.2,
                        random-shuffle       >= 0.0,
                        random               >= 1.1,
-                       hxt                  >= 9.3
+                       hxt                  >= 9.3,
+                       logfloat             >= 0.13
 
   hs-source-dirs:      haskell
   default-language:    Haskell2010

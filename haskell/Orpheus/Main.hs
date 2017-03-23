@@ -21,6 +21,9 @@ import Data.MusicXML.Parser
 import Options.Applicative
 import qualified Data.HashMap.Lazy as HM
 
+import qualified Orpheus.Hakaru.Train as T
+import qualified Orpheus.Hakaru.Predict as P
+
 
 --------------------------------------------------------------------------------
 --                             Executable Options                             --
@@ -134,9 +137,10 @@ main = do
       datasetSummary ds
       classifierSummary ds
 
-    Run fs hk -> do
+    Run fs _ -> do
       putStrLn "MODE: Run..."
-      putStrLn $ "Compiling Hakaru: " ++ hk
+      -- putStrLn $ "Compiling Hakaru: " ++ hk
       putStrLn $ "Parsing dataset: " ++ fs
+
       -- > This program should run a hakaru classifier
       -- > on a feature set
