@@ -121,7 +121,10 @@ main = do
           countC = foldr (\(c,f) (x,y,z) -> case c of
                                               Bach -> (f+x,y,z)
                                               Beethoven -> (x,f+y,z)
-                                              Horetzky -> (x,y,z+f)) (0,0,0) cAndC
+                                              Horetzky -> (x,y,z+f)
+                         )
+                         (0,0,0)
+                         cAndC
       putStrLn . show $ countC
 
     DataSummary -> do
@@ -131,8 +134,9 @@ main = do
       datasetSummary ds
       classifierSummary ds
 
-    Run _ _ -> do
+    Run fs hk -> do
       putStrLn "MODE: Run..."
-      putStrLn "TODO"
+      putStrLn $ "Compiling Hakaru: " ++ hk
+      putStrLn $ "Parsing dataset: " ++ fs
       -- > This program should run a hakaru classifier
       -- > on a feature set
