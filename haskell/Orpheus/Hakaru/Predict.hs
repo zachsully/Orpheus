@@ -8,7 +8,7 @@ import qualified System.Random.MWC                as MWC
 import           Control.Monad
 import           Data.Number.LogFloat hiding (product)
 
-prog = 
+prog =
   let_ (lam $ \ categories1 ->
         lam $ \ features2 ->
         lam $ \ params3 ->
