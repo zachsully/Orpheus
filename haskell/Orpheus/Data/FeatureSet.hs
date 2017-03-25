@@ -1,8 +1,8 @@
-module Orpheus.Data.Feature where
+module Orpheus.Data.FeatureSet where
 
 import qualified Data.HashMap.Lazy as HM
 import qualified Data.Set as Set
-import Orpheus.DataSet
+import Orpheus.Data.DataSet
 import Orpheus.Data.Music.Context
 
 --------------------------------------------------------------------------------

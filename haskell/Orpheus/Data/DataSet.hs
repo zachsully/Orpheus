@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
-module Orpheus.DataSet where
+module Orpheus.Data.DataSet where
 
 import GHC.Generics (Generic)
 import Control.Monad

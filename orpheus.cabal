@@ -29,15 +29,14 @@ library
                        Orpheus.Data.Music.Chord,
                        Orpheus.Data.Music.Nursery,
                        Orpheus.Data.Music.Context,
-                       Orpheus.Data.Feature,
-                       Orpheus.DataSet,
-                       Data.Lilypond.Pretty,
-                       Data.Lilypond.Parser
-                       Data.MusicXML.Pretty,
-                       Data.MusicXML.Parser,
-
+                       Orpheus.Data.FeatureSet,
+                       Orpheus.Data.DataSet,
                        Orpheus.Hakaru.Train,
-                       Orpheus.Hakaru.Predict
+                       Orpheus.Hakaru.Predict,
+                       Data.Lilypond.Pretty,
+                       Data.Lilypond.Parser,
+                       Data.MusicXML.Pretty,
+                       Data.MusicXML.Parser
 
   other-extensions:    DataKinds, OverloadedStrings, TypeFamilies
 

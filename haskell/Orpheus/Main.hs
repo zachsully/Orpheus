@@ -21,8 +21,8 @@ import Data.MusicXML.Parser
 import Options.Applicative
 import qualified Data.HashMap.Lazy as HM
 
-import qualified Orpheus.Hakaru.Train as T
-import qualified Orpheus.Hakaru.Predict as P
+import qualified Orpheus.Hakaru.Train as Train
+import qualified Orpheus.Hakaru.Predict as Predict
 
 
 --------------------------------------------------------------------------------
@@ -139,8 +139,8 @@ main = do
 
     Run fs _ -> do
       putStrLn "MODE: Run..."
-      -- putStrLn $ "Compiling Hakaru: " ++ hk
       putStrLn $ "Parsing dataset: " ++ fs
-
-      -- > This program should run a hakaru classifier
-      -- > on a feature set
+      let (trainSet,testSet) = trainTestPartition undefined
+          model = Train.prog 10 10 undefined
+          predictions = Predict.prog undefined undefined undefined undefined
+      return ()

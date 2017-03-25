@@ -3,7 +3,7 @@ module Orpheus.Model.Discriminative where
 import Orpheus.Model.Discriminative.MajorityClass
 import Orpheus.Model.Type
 import Orpheus.Data.Music.Context
-import Orpheus.DataSet
+import Orpheus.Data.DataSet
 
 import Control.Monad
 
