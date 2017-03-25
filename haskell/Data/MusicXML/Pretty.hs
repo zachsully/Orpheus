@@ -1,7 +1,7 @@
 module Data.MusicXML.Pretty where
 
-import Text.XML.HXT.Core
-import Orpheus.Data.Music.Diatonic
+-- import Text.XML.HXT.Core
+import Orpheus.Data.Music.Context
 
-prettyPrintMusicXML :: Score -> String
+prettyPrintMusicXML :: Score a -> String
 prettyPrintMusicXML = undefined

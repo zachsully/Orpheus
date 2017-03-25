@@ -13,7 +13,7 @@ logisticRegression = Classifier { train   = trainLogisticRegression 10
                                 , predict = testLogisticRegression }
 
 trainLogisticRegression :: Double -> [(x,y)] -> Params
-trainLogisticRegression l2_weight ds = undefined
+trainLogisticRegression _ _ = undefined
 
 testLogisticRegression :: Params -> x -> y
-testLogisticRegression = undefined                       
+testLogisticRegression = undefined

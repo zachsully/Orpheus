@@ -38,7 +38,7 @@ inferGammaPosterior
   -> abt '[] 'HProb
   -> abt '[] ('HArray ('HArray HPrimitive))
   -> abt '[] (hPair 'HProb 'HProb)
-inferGammaPosterior shape scale dataset = undefined
+inferGammaPosterior _ _ _ = undefined
   -- let  n = size(dataset)
   --      x = (summate i from 0 to (size dataset):
   --             size(dataset[i])) / n

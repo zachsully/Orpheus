@@ -34,9 +34,8 @@ prettyXMLFile fin fout =
      >>> putXmlDocument True fout)
   >> return ()
 
-
-errorA :: (ArrowXml a, Show b) => a b c
-errorA = arr (error . show)
+-- errorA :: (ArrowXml a, Show b) => a b c
+-- errorA = arr (error . show)
 
 --------------------------------------------------------------------------------
 --                               Score Partwise                               --

@@ -126,7 +126,7 @@ featureKeySig ds =
   fmap (\e@(_,c) ->
          let counts' = bucketKeySig e
          in (fmap (\k -> case HM.lookup k counts' of
-                           Just x  -> 1
+                           Just _  -> 1
                            Nothing -> 0
                   )
                   unique
@@ -139,7 +139,7 @@ featureTimeSig :: DataSet -> FeatureSet
 featureTimeSig ds = fmap (\e@(_,c) ->
                           let counts' = bucketTimeSig e
                           in (fmap (\k -> case HM.lookup k counts' of
-                                            Just x  -> 1
+                                            Just _  -> 1
                                             Nothing -> 0
                                    )
                                    unique

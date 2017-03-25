@@ -238,7 +238,7 @@ sSymbol_Primitive = SingSymbol
 
 
 hRest :: ast HDuration -> ast HBool -> Datum ast HPrimitive
-hRest dur bool = undefined -- Datum "Rest" sDuration (Inl $ Done)
+hRest _ _ = undefined -- Datum "Rest" sDuration (Inl $ Done)
 
 
 
