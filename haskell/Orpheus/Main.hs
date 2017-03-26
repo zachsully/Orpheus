@@ -109,13 +109,13 @@ main = do
                   Just x  -> rPermute (read x) (length ds) ds
                   Nothing -> rPermute 0 (length ds) ds
       putStrLn "Writing dataset/feature/keysig.csv"
-      writeFeatureSet "dataset/feature/keysig.csv" (featureKeySig ds')
+      writeBernoulliFeatureSet "dataset/feature/keysig.csv" (featureKeySig ds')
       putStrLn "Writing dataset/feature/timesig.csv"
-      writeFeatureSet "dataset/feature/timesig.csv" (featureTimeSig ds')
+      writeBernoulliFeatureSet "dataset/feature/timesig.csv" (featureTimeSig ds')
       putStrLn "Writing dataset/feature/primitive.csv"
-      writeFeatureSet "dataset/feature/primitive.csv" (featurePrimitive ds')
+      writeMultinomialFeatureSet "dataset/feature/primitive.csv" (featurePrimitive ds')
       putStrLn "Writing dataset/feature/all.csv"
-      writeFeatureSet "dataset/feature/all.csv" (featureAll ds')
+      writeMultinomialFeatureSet "dataset/feature/all.csv" (featureAll ds')
 
     Total -> do
       ds <- getDataSet
@@ -140,8 +140,13 @@ main = do
     Run fp _ -> do
       putStrLn "MODE: Run..."
       putStrLn $ "Parsing feature set: " ++ fp
-      fs <- readFeatureSet fp
+      fs <- readBernoulliFeatureSet fp
       let (trainSet,testSet) = trainTestPartition fs
-          model = Train.prog 0 0 (G.convert trainSet)
+          model = Train.prog 0 0 (G.fromList
+                                 $ fmap (\(f,c) -> (G.fromList f
+                                                   , featureComposer c)
+                                        )
+                                        trainSet
+                                 )
           -- predictions = fmap (Predict.prog 0 0 model $ G.convert) testSet
       return ()
