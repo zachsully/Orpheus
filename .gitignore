@@ -4,3 +4,9 @@
 dist
 target
 data
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc

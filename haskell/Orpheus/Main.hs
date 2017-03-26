@@ -142,6 +142,6 @@ main = do
       putStrLn $ "Parsing feature set: " ++ fp
       fs <- readFeatureSet fp
       let (trainSet,testSet) = trainTestPartition fs
-          -- model = Train.prog 10 10 (G.convert trainSet)
-          -- predictions = Predict.prog undefined undefined undefined undefined
+          model = Train.prog 0 0 (G.convert trainSet)
+          -- predictions = fmap (Predict.prog 0 0 model $ G.convert) testSet
       return ()

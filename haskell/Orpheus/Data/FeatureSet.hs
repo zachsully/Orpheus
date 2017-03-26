@@ -114,33 +114,34 @@ After obtaining the set of unique features, traverse the dataset again an obtain
 a the counts of these unique features
 -}
 
-type FeatureSet = [[Int]]
+type FeatureSet a = [([a],Int)]
 
 featureComposer :: Composer -> Int
 featureComposer Bach      = 1
 featureComposer Beethoven = 2
 featureComposer Horetzky  = 3
 
-featureKeySig :: DataSet -> FeatureSet
+featureKeySig :: DataSet -> FeatureSet Bool
 featureKeySig ds =
   fmap (\e@(_,c) ->
          let counts' = bucketKeySig e
-         in (fmap (\k -> case HM.lookup k counts' of
-                           Just _  -> 1
-                           Nothing -> 0
+         in ((fmap (\k -> case HM.lookup k counts' of
+                           Just _  -> True
+                           Nothing -> False
                   )
                   unique
-            ) ++ [featureComposer c]
+             )
+            ,featureComposer c)
        )
        ds
   where unique = Set.toList . uniqueKeySig $ ds
 
-featureTimeSig :: DataSet -> FeatureSet
+featureTimeSig :: DataSet -> FeatureSet Bool
 featureTimeSig ds = fmap (\e@(_,c) ->
                           let counts' = bucketTimeSig e
                           in (fmap (\k -> case HM.lookup k counts' of
-                                            Just _  -> 1
-                                            Nothing -> 0
+                                            Just _  -> True
+                                            Nothing -> False
                                    )
                                    unique
                              ) ++ [featureComposer c]
@@ -148,7 +149,7 @@ featureTimeSig ds = fmap (\e@(_,c) ->
                          ds
   where unique = Set.toList . uniqueTimeSig $ ds
 
-featurePrimitive :: DataSet -> FeatureSet
+featurePrimitive :: DataSet -> FeatureSet Int
 featurePrimitive ds = fmap (\e@(_,c) ->
                              let counts' = bucketPrimitive e
                              in (fmap (\k -> case HM.lookup k counts' of
