@@ -14,14 +14,14 @@
 module Main where
 
 import Orpheus.Model.Discriminative
-import Orpheus.DataSet
-import Orpheus.Data.Feature
+import Orpheus.Data.DataSet
+import Orpheus.Data.FeatureSet
 import Data.Monoid
 import Data.MusicXML.Parser
 import Options.Applicative
-import qualified Data.HashMap.Lazy as HM
-
-import qualified Orpheus.Hakaru.Train as Train
+import qualified Data.HashMap.Lazy      as HM
+import qualified Data.Vector.Generic    as G
+import qualified Orpheus.Hakaru.Train   as Train
 import qualified Orpheus.Hakaru.Predict as Predict
 
 
@@ -141,7 +141,7 @@ main = do
       putStrLn "MODE: Run..."
       putStrLn $ "Parsing feature set: " ++ fp
       fs <- readFeatureSet fp
-      let (trainSet,testSet) = trainTestPartition undefined
-          model = Train.prog 10 10 undefined
-          predictions = Predict.prog undefined undefined undefined undefined
+      let (trainSet,testSet) = trainTestPartition fs
+          -- model = Train.prog 10 10 (G.convert trainSet)
+          -- predictions = Predict.prog undefined undefined undefined undefined
       return ()
