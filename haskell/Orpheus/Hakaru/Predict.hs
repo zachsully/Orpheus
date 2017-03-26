@@ -9,22 +9,7 @@ import           Language.Hakaru.Types.Sing
 import qualified System.Random.MWC                as MWC
 import           Control.Monad
 import           Data.Number.LogFloat             hiding (product)
-import qualified Data.Vector.Generic              as G
 
--- reduce
---     :: (G.Vector (MayBoxVec a) a)
---     => (a -> a -> a)
---     -> a
---     -> MayBoxVec a a
---     -> a
--- reduce f n v = G.foldr f n v
--- {-# INLINE reduce #-}
-
-prog :: Int
-     -> Int
-     -> MayBoxVec (Double, MayBoxVec Double Double) (Double, MayBoxVec Double Double)
-     -> MayBoxVec Bool Bool
-     -> Int
 prog =
   let_ (lam $ \ categories1 ->
         lam $ \ features2 ->

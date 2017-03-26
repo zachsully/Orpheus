@@ -1,0 +1,210 @@
+\documentclass{beamer}
+\title{Composer Classification with Score Data}
+\author{Zach Sullivan}
+\date{2017}
+\usecolortheme{seagull}
+\setbeamertemplate{itemize items}[circle]
+
+\begin{document}
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Getting Data}
+Github projects
+\begin{itemize}
+\item MutopiaProject (Lilypond)
+\item jshanley/bach-chorales (MusicXml)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Dataset}
+  Score data from:
+  \vspace{1em}
+
+  \begin{center}
+  \begin{tabular}{c | c c}
+    Composer & pieces & primitives\\
+    \hline
+    Bach & 192 & 55,706 \\
+    Beethoven & 23 & 45,713 \\
+    Horetzky &  60 & 10,542 \\
+  \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Preprocessing Data}
+
+  A sequence of transformations:
+
+  \begin{center}
+    Lilypond
+    $\rightarrow_1$ MusicXml
+    $\rightarrow_2$ Internal Repr
+    $\rightarrow_3$ Feature Sets
+  \end{center}
+
+  \begin{enumerate}
+    \item Uses {\tt python-ly} tool (lost: scores with Scheme code)
+    \item Requires a context-sensitive parser (lost: accidentals and chords)
+    \item randomly shuffles the data, output is a CSV
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Feature Sets}
+  Dimensions of data:
+  \begin{itemize}
+  \item Key Signatures: $\{0,1\}^{17}$
+  \item Time Signatures: $\{0,1\}^{7}$
+  \item Note $\times$ Duration: $\mathbb{N}^{536}$
+  \item Key Signature
+    $\times$ Time Signature
+    $\times$ Note
+    $\times$ Duration:
+    $\mathbb{N}^{560}$
+  \end{itemize}
+\end{frame}
+
+% Ablative analysis of features
+\begin{frame}
+  \frametitle{Confusion Matrix}
+  \begin{figure}[!t]
+    \begin{center}
+      \begin{tabular}{c | c c c}
+        & Bach  & Beethoven & Horetzky \\
+        \hline
+        Bach & 61 & 3 & 9 \\
+        Beethoven & 0  & 0 & 0 \\
+        Horetzky & 0  & 2 & 7
+      \end{tabular}
+    \end{center}
+    \caption{
+      Logistic Regression Classifier on TimeSignature features.
+      Correct: 68 out of 82;
+      Accuracy: 0.829
+    }
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Confusion Matrix}
+  \begin{figure}[!t]
+    \begin{center}
+      \begin{tabular}{c | c c c}
+        & Bach  & Beethoven & Horetzky \\
+        \hline
+        Bach & 53 & 5 & 5 \\
+        Beethoven & 0  & 0 & 0 \\
+        Horetzky & 8  & 0 & 11
+      \end{tabular}
+    \end{center}
+    \caption{
+      Logistic Regression Classifier on KeySignature features.
+      Correct: 64 out of 82;
+      Accuracy: 0.780
+    }
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Confusion Matrix}
+  \begin{figure}[!t]
+    \begin{center}
+      \begin{tabular}{c | c c c}
+        & Bach  & Beethoven & Horetzky \\
+        \hline
+        Bach & 60 & 1 & 1 \\
+        Beethoven & 0  & 3 & 0 \\
+        Horetzky & 1  & 1 & 15
+      \end{tabular}
+    \end{center}
+    \caption{
+      Logistic Regression Classifier on (Note,Duration) features.
+      Correct: 78 out of 82;
+      Accuracy: 0.951
+    }
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Confusion Matrix}
+  \begin{figure}[!t]
+    \begin{center}
+      \begin{tabular}{c | c c c}
+        & Bach  & Beethoven & Horetzky \\
+        \hline
+        Bach & 61 & 0 & 0 \\
+        Beethoven & 0  & 5 & 0 \\
+        Horetzky & 0  & 0 & 16
+      \end{tabular}
+    \end{center}
+    \caption{
+      Logistic Regression Classifier on all features.
+      Correct: 82 out of 82;
+      Accuracy: 1.0
+    }
+  \end{figure}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Results}
+  \begin{figure}
+    \begin{center}
+      \begin{tabular}{c || c | c | c }
+        Classifier & Correct & Incorrect & Percentage\\
+        \hline
+        Majority & 61 & 21 & 74.4\\
+        Random Forest & 82 & 82 & 100 \\
+        Logistic Regression & 82 & 82 & 100\\
+        Multinomial Naive Bayes & 82 & 82 & 100\\
+        SVM & 81 & 82 & 98.8 \\
+      \end{tabular}
+    \end{center}
+    \caption{Best results with different classifiers, all achieve using all of
+      the features.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Conclusions}
+\begin{itemize}
+  \item Bias towards composers with more pieces
+  \item Different classifiers did not matter much
+  \item Over sampling Horetzky to give him more primitives, did not change the
+    results
+  \item Under sampling Bach and over sampling Beethoven, to have around 60
+    pieces, increased the variance and decreased performance
+  \item Putting all of the features together increased performance
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Future Work}
+\begin{itemize}
+\item More data
+\item Add chords to features
+\item Markov Models
+\item More data
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Other Music ML}
+  Problems
+  \begin{itemize}
+  \item Music Fingerprinting
+  \item Score Transcription
+  \item Pitch Detection
+  \end{itemize}
+  Data formats
+  \begin{itemize}
+  \item Audio
+  \item MIDI
+  \end{itemize}
+\end{frame}
+
+\end{document}
