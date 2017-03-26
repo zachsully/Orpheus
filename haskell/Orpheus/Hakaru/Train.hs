@@ -8,6 +8,10 @@ import qualified System.Random.MWC                as MWC
 import           Control.Monad
 import           Data.Number.LogFloat hiding (product)
 
+prog :: Int
+     -> Int
+     -> MayBoxVec (MayBoxVec Bool Bool, Int) (MayBoxVec Bool Bool, Int)
+     -> MayBoxVec (Double, MayBoxVec Double Double) (Double, MayBoxVec Double Double)
 prog =
   let_ (lam $ \ categories1 ->
         lam $ \ features2 ->

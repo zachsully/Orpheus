@@ -137,9 +137,10 @@ main = do
       datasetSummary ds
       classifierSummary ds
 
-    Run fs _ -> do
+    Run fp _ -> do
       putStrLn "MODE: Run..."
-      putStrLn $ "Parsing dataset: " ++ fs
+      putStrLn $ "Parsing feature set: " ++ fp
+      fs <- readFeatureSet fp
       let (trainSet,testSet) = trainTestPartition undefined
           model = Train.prog 10 10 undefined
           predictions = Predict.prog undefined undefined undefined undefined
