@@ -1,0 +1,34 @@
+# TRAIN a multinomial naive bayes model
+# input: number of categories, number of features, and a training set of pairs
+#        containing multinomial features and their category
+# output: an array of pairs for each category, containing a prior probability
+#         of that category and an array of probabilities of each feature given
+#         that category
+def multinomialNBTrain(categories nat,
+                       features   nat,
+                       train_set array(pair(array(nat),nat))):
+  array c of categories:
+    ccount = summate i from 0 to size(train_set):
+               match (train_set[i]):
+                 (fs,ic):
+                   match (ic == c):
+                     false: 0
+                     true: 1
+    condps = array i of features:
+               fcount = summate i from 0 to size(train_set):
+                          match (train_set[i]):
+                            (fs,ic):
+                              match (ic == c):
+                                false: 0
+                                true:  fs[i]
+               dcount = summate h from 0 to features:
+                          summate k from 0 to size(train_set):
+                            match (train_set[k]):
+                              (fs,ic):
+                                match (ic == c):
+                                  false: 0
+                                  true:  fs[h]
+               (fcount + 1) / (features + dcount)
+    (ccount/categories, condps)
+
+multinomialNBTrain
