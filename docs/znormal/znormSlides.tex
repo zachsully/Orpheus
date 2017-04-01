@@ -1,0 +1,101 @@
+\documentclass{beamer}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\title{$\mathbb{Z}$ Normal Distribution}
+\author{Zach Sullivan}
+\date{2017}
+\usecolortheme{seagull}
+\setbeamertemplate{itemize items}[circle]
+
+\begin{document}
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Motivation}
+Western music is discretized so that it is easier to notate.
+\vspace{1em}
+
+Discrete, yet infinitely negative and positive features:
+\begin{itemize}
+\item octaves
+\item dynamics
+\item tempo
+\item duration
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Normal Distribution}
+\[ \mu \in \mathbb{R},\ \sigma \in \mathbb{R}^+
+\]
+\vspace{1em}
+\[ p(x \mid \mu, \sigma^2) =
+  \frac{1}{\sqrt{2\pi\sigma^2}} e^{-\frac{(x - \mu)^2}{2\sigma^2}}
+\]
+\vspace{1em}
+\[ 1 = \int_\mathbb{R} p(x \mid \mu, \sigma^2)
+\]
+\end{frame}
+
+\begin{frame}
+\frametitle{$\mathbb{Z}$ Normal Distribution}
+\[ \mu \in \mathbb{Z},\ \sigma \in \mathbb{R}^+
+\]
+\vspace{1em}
+\[ p(x \mid \mu, \sigma^2) =
+  \frac{1}{\sqrt{2\pi\sigma^2}} e^{-\frac{(x - \mu)^2}{2\sigma^2}}
+\]
+\vspace{1em}
+\[ 1 = \sum_\mathbb{Z} p(x \mid \mu, \sigma^2)
+\]
+\end{frame}
+
+\begin{frame}
+\frametitle{$\mathbb{Z}$ Normal Distribution}
+Sample from $\mathcal{N}_{\mathbb{Z}}$ distribution with a mean
+$\mu \in \mathbb{Z}$ and a standard deviation of $\sigma^2 \in \mathbb{R}^+$
+\begin{align*}
+&\ \,x \sim \mathcal{N}(\mu,\sigma^2)\\
+&\lfloor x \rfloor
+\end{align*}
+\end{frame}
+
+\begin{frame}
+\frametitle{$\mathbb{Z}$ Normal Distribution}
+{\it Theorem 1.} This sampling method for $\mathcal{N}_{\mathbb{Z}}$ distribution
+denotes a probability distribution over $\mathbb{Z}$.
+\end{frame}
+
+\begin{frame}
+\frametitle{{\it Theorem}}
+{\it Proof.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Durations}
+Most common durations are half, quarter, and eight, but the scale is infinite
+\vspace{1em}
+
+Durations can be represented as a pair in $\mathbb{Z} \times \mathbb{N}$ where
+the first element is the base duration and the second element is the number of
+dots.
+
+\begin{align*}
+d &\sim \mathcal{N}_{\mathbb{Z}}(\mu,\sigma^2)\\
+x &\sim B(n,p)\\
+(d&,x)
+\end{align*}
+\end{frame}
+
+\begin{frame}
+\frametitle{Octaves}
+\end{frame}
+
+\begin{frame}
+\frametitle{Tempo}
+\end{frame}
+
+\begin{frame}
+\frametitle{Dynamics}
+\end{frame}
+\end{document}
