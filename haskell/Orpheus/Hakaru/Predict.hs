@@ -9,13 +9,15 @@ import           Language.Hakaru.Types.Sing
 import qualified System.Random.MWC                as MWC
 import           Control.Monad
 import           Data.Number.LogFloat             hiding (product)
+import qualified Data.Vector.Generic              as G
+import qualified Data.Vector.Unboxed              as U
 
 prog :: Int
      -> Int
      -> (MinBoxVec (MayBoxVec Double)
-                   (MayBoxVec (MayBoxVec Double Double))
-                   (Double, MayBoxVec Double Double))
-     -> MayBoxVec Bool Bool
+                   (MayBoxVec ((MayBoxVec Double) Double))
+                   (Double, (MayBoxVec Double) Double))
+     -> (MayBoxVec Bool) Bool
      -> Int
 prog =
   let_ (lam $ \ categories1 ->
