@@ -141,6 +141,7 @@ main = do
       putStrLn "MODE: Run..."
       putStrLn $ "Parsing feature set: " ++ fp
       fs <- readBernoulliFeatureSet fp
+      error $ show fs
       let (trainSet,testSet) = trainTestPartition fs
           model = Train.prog 0 0 (G.fromList
                                  $ fmap (\(f,c) -> (G.fromList f

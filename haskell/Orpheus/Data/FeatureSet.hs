@@ -5,6 +5,7 @@ import qualified Data.Set as Set
 import Orpheus.Data.DataSet
 import Orpheus.Data.Music.Context
 import Numeric.Natural
+import Text.CSV (parseCSVFromFile)
 
 --------------------------------------------------------------------------------
 --                              Unique Features                               --
@@ -46,10 +47,10 @@ uniquePrimitive = foldr (\(Score ps,_) sigs ->
                                   Set.empty
 
 uniqueDuration :: DataSet -> Set.Set Duration
-uniqueDuration = undefined
+uniqueDuration = error "TODO{uniqueDuration}"
 
 uniquePitchclass :: DataSet -> Set.Set Pitchclass
-uniquePitchclass = undefined
+uniquePitchclass = error "TODO{uniquePitchclass}"
 
 --------------------------------------------------------------------------------
 --                              Feature Buckets                               --
@@ -100,12 +101,12 @@ bucketPrimitive (Score ps,_) = featurePrimitive' ps
 bucketDuration
   :: (Score a, Composer)
   -> HM.HashMap Duration Natural
-bucketDuration = undefined
+bucketDuration = error "TODO{bucketDuration}"
 
 bucketPitchclass
   :: (Score a, Composer)
   -> HM.HashMap Pitchclass Natural
-bucketPitchclass = undefined
+bucketPitchclass = error "TODO{bucketPitchclass}"
 
 --------------------------------------------------------------------------------
 --                               Feature Maps                                 --
@@ -166,10 +167,10 @@ featurePrimitive ds = fmap (\e@(_,c) ->
   where unique = Set.toList . uniquePrimitive $ ds
 
 featureDuration :: DataSet -> FeatureSet Natural Composer
-featureDuration = undefined
+featureDuration = error "TODO{featureDuration}"
 
 featurePitchclass :: DataSet -> FeatureSet Natural Composer
-featurePitchclass = undefined
+featurePitchclass = error "TODO{featurePitchclass}"
 
 featureAll :: DataSet -> FeatureSet Natural Composer
 featureAll ds = fmap (\e@(_,c) ->
@@ -209,6 +210,15 @@ Once we have obtained the feature maps, we need support for reading and writing
 these to files, we do not want to do this every time the program is run
 -}
 
+readComposer :: String -> Composer
+readComposer "1" = Bach
+readComposer "2" = Beethoven
+readComposer "3" = Horetzky
+
+readBool :: String -> Bool
+readBool "0" = False
+readBool "1" = True
+
 writeBernoulliFeatureSet :: FilePath -> FeatureSet Bool Composer -> IO ()
 writeBernoulliFeatureSet fp fs =
   let csv = foldr (\entry file ->
@@ -220,10 +230,20 @@ writeBernoulliFeatureSet fp fs =
   in writeFile fp csv
 
 writeMultinomialFeatureSet :: FilePath -> FeatureSet Natural Composer -> IO ()
-writeMultinomialFeatureSet = undefined
+writeMultinomialFeatureSet = error "TODO{writeMultinomialFeatureSet}"
 
 readBernoulliFeatureSet :: FilePath -> IO (FeatureSet Bool Composer)
-readBernoulliFeatureSet = undefined
+readBernoulliFeatureSet fp = do
+  erows <- parseCSVFromFile fp
+  case erows of
+    Left x -> error $ show x
+    Right rows -> return
+               $  fmap (\cols -> let len = length cols in
+                         ( fmap readBool . take (len-1) $ cols
+                         , readComposer . error . show . head . drop (len-1) $ cols
+                         )
+                       )
+                       rows
 
 readMultinomialFeatureSet :: FilePath -> IO (FeatureSet Natural Composer)
-readMultinomialFeatureSet = undefined
+readMultinomialFeatureSet = error "TODO{readMultinomialFeatureSet}"
