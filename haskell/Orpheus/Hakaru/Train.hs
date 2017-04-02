@@ -1,14 +1,14 @@
 {-# LANGUAGE DataKinds, NegativeLiterals #-}
 module Orpheus.Hakaru.Train where
 
-import           Prelude                          hiding (product)
+import           Prelude hiding (product)
 import           Language.Hakaru.Runtime.Prelude
 import           Language.Hakaru.Types.Sing
 import qualified System.Random.MWC                as MWC
 import           Control.Monad
-import           Data.Number.LogFloat             hiding (product)
+import           Data.Number.LogFloat hiding (product)
 
-prog =
+prog = 
   let_ (lam $ \ categories1 ->
         lam $ \ features2 ->
         lam $ \ train_set3 ->
@@ -27,14 +27,14 @@ prog =
                            \ i10 ->
                            let_ (summate (nat_ 0)
                                          (size train_set3)
-                                         (\ i12 ->
-                                          case_ (train_set3 ! i12)
+                                         (\ j12 ->
+                                          case_ (train_set3 ! j12)
                                                 [branch (ppair PVar PVar)
-                                                        (\ fs13 ic14 ->
-                                                         case_ (ic14 == c4)
+                                                        (\ fs13 jc14 ->
+                                                         case_ (jc14 == c4)
                                                                [branch pfalse (nat_ 0),
                                                                 branch ptrue
-                                                                       (case_ (fs13 ! i12)
+                                                                       (case_ (fs13 ! i10)
                                                                               [branch pfalse
                                                                                       (nat_ 0),
                                                                                branch ptrue
