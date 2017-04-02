@@ -6,6 +6,7 @@ import Orpheus.Data.DataSet
 import Orpheus.Data.Music.Context
 import Numeric.Natural
 import Text.CSV (parseCSVFromFile)
+import Data.Monoid ((<>))
 
 --------------------------------------------------------------------------------
 --                              Unique Features                               --
@@ -119,9 +120,9 @@ a the counts of these unique features
 type FeatureSet a b = [([a],b)]
 
 featureComposer :: Composer -> Int
-featureComposer Bach      = 1
-featureComposer Beethoven = 2
-featureComposer Horetzky  = 3
+featureComposer Bach      = 0
+featureComposer Beethoven = 1
+featureComposer Horetzky  = 2
 
 featureKeySig :: DataSet -> FeatureSet Bool Composer
 featureKeySig ds =
@@ -211,23 +212,38 @@ these to files, we do not want to do this every time the program is run
 -}
 
 readComposer :: String -> Composer
-readComposer "1" = Bach
-readComposer "2" = Beethoven
-readComposer "3" = Horetzky
+readComposer "0" = Bach
+readComposer "1" = Beethoven
+readComposer "2" = Horetzky
 
 readBool :: String -> Bool
 readBool "0" = False
 readBool "1" = True
 
+writeComposer :: Composer -> String
+writeComposer Bach      = "0"
+writeComposer Beethoven = "1"
+writeComposer Horetzky  = "2"
+
+writeBool :: Bool -> String
+writeBool False = "0"
+writeBool True  = "1"
+
+
+intersperce :: String -> [String] -> String
+intersperce x []     = []
+intersperce x (y:[]) = y
+intersperce x (y:ys) = concat [y,x,intersperce x ys]
+
 writeBernoulliFeatureSet :: FilePath -> FeatureSet Bool Composer -> IO ()
 writeBernoulliFeatureSet fp fs =
-  let csv = foldr (\entry file ->
-                    init (foldr (\f row -> show f ++ "," ++ row)
-                                ""
-                                entry) ++ "\n" ++ file)
-                  []
-                  fs
-  in writeFile fp csv
+  let csv = intersperce "\n"
+          $ fmap (\(fts,c) -> intersperce ","
+                           $  (fmap writeBool fts)
+                           <> [writeComposer $ c]
+                 )
+                 fs
+  in writeFile fp (csv ++ "\n")
 
 writeMultinomialFeatureSet :: FilePath -> FeatureSet Natural Composer -> IO ()
 writeMultinomialFeatureSet = error "TODO{writeMultinomialFeatureSet}"

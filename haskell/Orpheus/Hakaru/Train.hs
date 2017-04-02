@@ -42,6 +42,6 @@ prog =
                            nat2prob (fcount11 + nat_ 1) *
                            recip (nat2prob (ccount5 + nat_ 2))) $ \ condps9 ->
                ann_ (SData (STyApp (STyApp (STyCon (SingSymbol :: Sing "Pair")) SProb) (SArray SProb)) (SPlus (SEt (SKonst SProb) (SEt (SKonst (SArray SProb)) SDone)) SVoid))
-                    (pair (nat2prob ccount5 * recip (nat2prob categories1))
+                    (pair (nat2prob ccount5 * recip (nat2prob (size train_set3)))
                           condps9))) $ \ mvBernNBTrain0 ->
   mvBernNBTrain0

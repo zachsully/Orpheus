@@ -25,6 +25,6 @@ def mvBernNBTrain(categories nat,
 				    false: 0
 				    true: 1
                (fcount + 1) / (ccount + 2)
-    (ccount/categories, condps)
+    (ccount/size(train_set), condps)
 
 mvBernNBTrain
