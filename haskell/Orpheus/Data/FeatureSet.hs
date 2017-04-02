@@ -240,10 +240,10 @@ readBernoulliFeatureSet fp = do
     Right rows -> return
                $  fmap (\cols -> let len = length cols in
                          ( fmap readBool . take (len-1) $ cols
-                         , readComposer . error . show . head . drop (len-1) $ cols
+                         , readComposer . head . drop (len-1) $ cols
                          )
                        )
-                       rows
+                       (init rows)
 
 readMultinomialFeatureSet :: FilePath -> IO (FeatureSet Natural Composer)
 readMultinomialFeatureSet = error "TODO{readMultinomialFeatureSet}"
