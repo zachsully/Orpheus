@@ -21,6 +21,7 @@ import Data.MusicXML.Parser
 import Options.Applicative
 import qualified Data.HashMap.Lazy      as HM
 import qualified Data.Vector.Generic    as G
+import qualified Data.Vector.Unboxed    as U
 import qualified Orpheus.Hakaru.Train   as Train
 import qualified Orpheus.Hakaru.Predict as Predict
 
@@ -143,13 +144,21 @@ main = do
       putStrLn $ "Parsing feature set: " ++ fp
       fs <- readBernoulliFeatureSet fp
       let (trainSet,testSet) = trainTestPartition fs
+          numCategories = 3
           numFeatures = length . fst . head $ fs
-          model = Train.prog 3 numFeatures
+          model = Train.prog numCategories numFeatures
                     (G.fromList
                     $ fmap (\(f,c) -> (G.fromList f
                                       , featureComposer c)
                            )
                            trainSet
                     )
-          -- predictions = fmap (Predict.prog 0 0 model $ G.convert) testSet
+          predictions = fmap (\(fts, c) ->
+                               ( Predict.prog numCategories numFeatures model
+                               $ G.convert $ U.fromList fts
+                               , c
+                               )
+                             )
+                             testSet
       putStrLn $ show model
+      putStrLn $ show predictions

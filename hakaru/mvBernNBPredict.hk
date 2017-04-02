@@ -12,7 +12,7 @@ def mvBernNBPredict(categories nat,
 	     (pc,pfs):
                product i from 0 to features:
                  match (x[i]):
-		   false: pfs[i]
+		   false: 1 - pfs[i]
 	           true:  pfs[i]
   pMax = fn c1 nat:
            fn c2 nat:

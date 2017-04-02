@@ -1,25 +1,14 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE NegativeLiterals #-}
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE DataKinds, NegativeLiterals #-}
 module Orpheus.Hakaru.Predict where
 
-import           Prelude                          hiding (product)
+import           Prelude hiding (product)
 import           Language.Hakaru.Runtime.Prelude
 import           Language.Hakaru.Types.Sing
 import qualified System.Random.MWC                as MWC
 import           Control.Monad
-import           Data.Number.LogFloat             hiding (product)
-import qualified Data.Vector.Generic              as G
-import qualified Data.Vector.Unboxed              as U
+import           Data.Number.LogFloat hiding (product)
 
-prog :: Int
-     -> Int
-     -> (MinBoxVec (MayBoxVec Double)
-                   (MayBoxVec ((MayBoxVec Double) Double))
-                   (Double, (MayBoxVec Double) Double))
-     -> (MayBoxVec Bool) Bool
-     -> Int
-prog =
+prog = 
   let_ (lam $ \ categories1 ->
         lam $ \ features2 ->
         lam $ \ params3 ->
@@ -33,8 +22,11 @@ prog =
                                            features2
                                            (\ i9 ->
                                             case_ (x4 ! i9)
-                                                  [branch pfalse (pfs8 ! i9),
-                                                   branch ptrue (pfs8 ! i9)]))]) $ \ pCat5 ->
+                                                  [branch pfalse
+                                                          (nat2real (nat_ 1) +
+                                                           negate (fromProb (pfs8 ! i9))),
+                                                   branch ptrue
+                                                          (fromProb (pfs8 ! i9))]))]) $ \ pCat5 ->
         let_ (lam $ \ c111 ->
               lam $ \ c212 ->
               case_ (pCat5 ! c212 < pCat5 ! c111)
