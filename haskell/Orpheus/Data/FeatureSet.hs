@@ -215,10 +215,12 @@ readComposer :: String -> Composer
 readComposer "0" = Bach
 readComposer "1" = Beethoven
 readComposer "2" = Horetzky
+readComposer x   = error $ "Orpheus.Data.FeatureSet.readComposer " ++ x ++ " is not a composer."
 
 readBool :: String -> Bool
 readBool "0" = False
 readBool "1" = True
+readBool x   = error $ "Orpheus.Data.FeatureSet.readBool " ++ x ++ " is not a bool."
 
 writeComposer :: Composer -> String
 writeComposer Bach      = "0"
@@ -231,8 +233,8 @@ writeBool True  = "1"
 
 
 intersperce :: String -> [String] -> String
-intersperce x []     = []
-intersperce x (y:[]) = y
+intersperce _ []     = []
+intersperce _ (y:[]) = y
 intersperce x (y:ys) = concat [y,x,intersperce x ys]
 
 writeBernoulliFeatureSet :: FilePath -> FeatureSet Bool Composer -> IO ()

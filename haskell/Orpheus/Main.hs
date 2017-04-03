@@ -34,7 +34,7 @@ data Mode
   | Feature (Maybe String)
   | Total
   | DataSummary
-  | Run FilePath (Maybe FilePath)
+  | Run FilePath Int (Maybe FilePath)
   deriving (Show,Eq)
 
 data Options = Options { mode :: Mode }
@@ -58,6 +58,7 @@ parseDataSummary = pure DataSummary
 parseRun :: Parser Mode
 parseRun = Run
        <$> strArgument (metavar "FEATURE_SET" <> help "input of labelled feature set")
+       <*> (read <$> strArgument (metavar "NUM_CAT" <> help "number of categories in feature set"))
        <*> optional (strArgument (metavar "HAKARU_PROG"
                                  <> help "hakaru classifier program"))
 
@@ -139,12 +140,11 @@ main = do
       datasetSummary ds
       classifierSummary ds
 
-    Run fp _ -> do
+    Run fp numCategories _ -> do
       putStrLn "MODE: Run..."
       putStrLn $ "Parsing feature set: " ++ fp
       fs <- readBernoulliFeatureSet fp
       let (trainSet,testSet) = trainTestPartition fs
-          numCategories = 3
           numFeatures = length . fst . head $ fs
           model = Train.prog numCategories numFeatures
                     (G.fromList
