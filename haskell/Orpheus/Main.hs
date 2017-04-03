@@ -160,5 +160,13 @@ main = do
                                )
                              )
                              testSet
+          (c,t) = foldr (\(pred,actual) (correct,total) ->
+                          if pred == (featureComposer actual)
+                          then (correct + 1, total + 1)
+                          else (correct, total + 1)
+                        )
+                        (0,0)
+                        predictions
+      putStrLn $ concat ["Correct: ",show c," out of ",show t]
+      putStrLn $ concat ["Accuracy: ",show (c/t),"\n"]
       putStrLn $ show model
-      putStrLn $ show predictions

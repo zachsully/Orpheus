@@ -22,15 +22,15 @@ prog =
                                            features2
                                            (\ i9 ->
                                             case_ (x4 ! i9)
-                                                  [branch pfalse
+                                                  [branch ptrue (fromProb (pfs8 ! i9)),
+                                                   branch pfalse
                                                           (nat2real (nat_ 1) +
-                                                           negate (fromProb (pfs8 ! i9))),
-                                                   branch ptrue
-                                                          (fromProb (pfs8 ! i9))]))]) $ \ pCat5 ->
+                                                           negate (fromProb (pfs8
+                                                                             ! i9)))]))]) $ \ pCat5 ->
         let_ (lam $ \ c111 ->
               lam $ \ c212 ->
-              case_ (pCat5 ! c212 < pCat5 ! c111)
-                    [branch pfalse (c212), branch ptrue (c111)]) $ \ pMax10 ->
+              case_ (pCat5 ! c212 < pCat5 ! c111 || pCat5 ! c111 == pCat5 ! c212)
+                    [branch ptrue (c111), branch pfalse (c212)]) $ \ pMax10 ->
         reduce pMax10
                (nat_ 0)
                (array categories1 $ \ i13 -> i13)) $ \ mvBernNBPredict0 ->
