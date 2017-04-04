@@ -16,7 +16,7 @@ def mvBernNBPredict(categories nat,
 		   false: 1 - pfs[i]
   pMax = fn c1 nat:
            fn c2 nat:
-	     match (pCat[c1] >= pCat[c2]):
+	     match (pCat[c1] > pCat[c2]):
 	       true:  c1
 	       false: c2
   reduce(pMax, 0, array i of categories: i)

@@ -92,7 +92,8 @@ trainValidTestPartition ds =
 trainTestPartition :: [a] -> ([a],[a])
 trainTestPartition ds =
    let len = length ds
-       ds' = rPermute 0 len ds
+       -- ds' = rPermute 0 len ds
+       ds' = ds
        seventy = ceiling (fromIntegral len * (0.7 :: Double))
    in ( take seventy ds'
       , drop seventy $ ds'

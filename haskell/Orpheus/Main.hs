@@ -144,6 +144,7 @@ main = do
       putStrLn "MODE: Run..."
       putStrLn $ "Parsing feature set: " ++ fp
       fs <- readBernoulliFeatureSet fp
+      putStrLn $ "# Categories: " ++ show numCategories
       let (trainSet,testSet) = trainTestPartition fs
           numFeatures = length . fst . head $ fs
           model = Train.prog numCategories numFeatures
